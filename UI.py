@@ -1,5 +1,6 @@
 import maya.cmds as cmds
 from constants import WIDTH
+from timeLine import CreateBuild, Play
 
 
 def start():
@@ -8,6 +9,10 @@ def start():
 
     if cmds.window("props", exists=True):
         cmds.deleteUI("props", window=True)
+
+    cmds.currentUnit(time='ntsc')
+    reset()
+
     MainUI().baseUI()
 
 
@@ -35,5 +40,13 @@ class MainUI:
         cmds.columnLayout(self.column, parent=self.typeWin)
 
         cmds.rowColumnLayout(numberOfColumns=1, columnWidth=[(1, self.width)], parent=self.column)
+        cmds.button(label="BUILD SCENE", command=lambda args: CreateBuild().buildObjects())
+        cmds.button(label="PLAY", command=lambda args: Play().forwards())
+        cmds.button(label="STOP", command=lambda args: Play().stop())
+        cmds.button(label="RESET", command=lambda args: reset())
         cmds.button(label="QUIT", command=lambda args: end())
         cmds.showWindow(self.window)
+
+
+def reset():
+    cmds.currentTime(1, edit=True)
