@@ -45,6 +45,10 @@ class MainUI:
 
         cmds.rowColumnLayout(numberOfColumns=1, columnWidth=[(1, self.width)], parent=self.column)
         cmds.button(label="BUILD SCENE", command=lambda args: CreateBuild().buildObjects())
+        cmds.intSliderGrp("frameNum", label="Number of Frames", field=True, minValue=10, maxValue=200, value=10,
+                          columnWidth=[(1, 100), (2, 50), (3, WIDTH-125)],  cal=[1, "center"])
+
+        cmds.rowColumnLayout(numberOfColumns=1, columnWidth=[(1, self.width)], parent=self.column)
         cmds.button(label="PLAY", command=lambda args: Play().forwards())
         cmds.button(label="REVERSE", command=lambda args: Play().backwards())
         cmds.button(label="STOP", command=lambda args: Play().stop())
@@ -54,4 +58,4 @@ class MainUI:
 
 
 def reset():
-    cmds.currentTime(1, edit=True)
+    cmds.currentTime(0, edit=True)

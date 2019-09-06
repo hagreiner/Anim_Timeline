@@ -16,4 +16,7 @@ reload(timeLine)
 reload(materials)
 UI.start()
 
+Step Four:
+    Press the double triangles at the top of the screen -> UI should appear
+
 """
