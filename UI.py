@@ -1,6 +1,7 @@
 import maya.cmds as cmds
-from constants import WIDTH
+from constants import WIDTH, SHADER_NAME
 from timeLine import CreateBuild, Play
+from materials import CreateShader
 
 
 def start():
@@ -9,6 +10,9 @@ def start():
 
     if cmds.window("props", exists=True):
         cmds.deleteUI("props", window=True)
+
+    if cmds.objExists(SHADER_NAME) == False:
+        CreateShader().create()
 
     cmds.currentUnit(time='ntsc')
     reset()
@@ -42,6 +46,7 @@ class MainUI:
         cmds.rowColumnLayout(numberOfColumns=1, columnWidth=[(1, self.width)], parent=self.column)
         cmds.button(label="BUILD SCENE", command=lambda args: CreateBuild().buildObjects())
         cmds.button(label="PLAY", command=lambda args: Play().forwards())
+        cmds.button(label="REVERSE", command=lambda args: Play().backwards())
         cmds.button(label="STOP", command=lambda args: Play().stop())
         cmds.button(label="RESET", command=lambda args: reset())
         cmds.button(label="QUIT", command=lambda args: end())

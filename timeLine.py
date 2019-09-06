@@ -1,5 +1,6 @@
 import maya.cmds as cmds
 import maya.mel as mel
+from materials import AssignShader
 
 
 class CreateBuild:
@@ -12,7 +13,9 @@ class CreateBuild:
         CreateBuild.cube = cube[0]
         cmds.polyPlanarProjection(CreateBuild.cube, pc=(0, 0, 0), imageScale=(0.001, 0.001))
         cmds.polyMoveUV(CreateBuild.cube, tu=-0.55, tv=-0.5)
-        print(CreateBuild.cube)
+        cmds.select(CreateBuild.cube)
+        cmds.delete(ch=True)
+        AssignShader(object=CreateBuild.cube).add()
         plane = cmds.polyPlane(w=50, h=50, ch=False)
         cmds.move(-30 - 50, 0, 0, plane, relative=True)
         CreateBuild.plane = plane[0]
@@ -20,11 +23,13 @@ class CreateBuild:
 
 class Play:
     def forwards(self):
-        LoadClipOne(direction="forward").load()
+        Play().stop()
+        LoadClipOne(direction="forward", object=CreateBuild.cube).load()
         cmds.play(forward=True)
 
     def backwards(self):
-        LoadClipOne(direction="backwards").load()
+        Play().stop()
+        LoadClipOne(direction="backwards", object=CreateBuild.cube).load()
         cmds.play(forward=True)
 
     def stop(self):
@@ -32,17 +37,45 @@ class Play:
 
 
 class LoadClipOne:
-    def __init__(self, direction):
-        self.direction = direction
+    def __init__(self, direction, object):
+        if direction == "forward":
+            self.direction = 0
+        else:
+            self.direction = 250
+        if object == CreateBuild.cube:
+            self.object = "objectCube"
+        if object == CreateBuild.plane:
+            self.object = "objectPlane"
 
     def load(self):
-        pass
+        (ClipDictionary().dicts(self.direction)[self.object]).keys()
         # https://download.autodesk.com/us/maya/2009help/CommandsPython/setAttr.html
-        # cmds.setKeyframe(CreateBuild.cube, attribute='translateX', t=[0, 7], v=0)
-        # cmds.setKeyframe(CreateBuild.cube, attribute='translateX', t=[80, 100], v=80)
-        # c = cmds.setAttr(CreateBuild.cube, type="polyFace.mu")
-        # cmds.setKeyframe((CreateBuild.cube), hierarchy="none", at="uvpivot", controlPoints=True, shape=True, bd=True, t=[0, 30])
-        # # setKeyframe -breakdown 0 -hierarchy none -controlPoints 0 -shape 0 {"pPlane1.f[0:99]"};
-        #
-        # cmds.polyMoveUV(CreateBuild.cube, tu=1, tv=-0.5)
-        # cmds.setKeyframe(CreateBuild.cube + ".uvPivot", bd=True, at="uvPivot", t=[40, 50])
+        # https://lesterbanks.com/2018/04/animate-textures-objects-maya/
+        # https: // www.youtube.com / watch?v = UnGvFIQVfZ4
+
+
+class ClipDictionary:
+    def dicts(self, value):
+        clips = {
+            "objectCube": {
+                1: cmds.setKeyframe(CreateBuild.cube, attribute='translateX', t=[0, 10], v=abs(value)),
+                2: cmds.setKeyframe(CreateBuild.cube, attribute='translateX', t=[10, 20], v=abs(value - 50)),
+                3: cmds.setKeyframe(CreateBuild.cube, attribute='translateX', t=[20, 30], v=abs(value - 100)),
+                4: cmds.setKeyframe(CreateBuild.cube, attribute='translateX', t=[30, 40], v=abs(value - 150)),
+                5: cmds.setKeyframe(CreateBuild.cube, attribute='translateX', t=[40, 50], v=abs(value - 200)),
+                6: cmds.setKeyframe(CreateBuild.cube, attribute='translateX', t=[50, 60], v=abs(value - 250)),
+            },
+            "objectPlane": {
+                1: cmds.setKeyframe(CreateBuild.plane, attribute='translateX', t=[0, 10], v=-abs(value)),
+                2: cmds.setKeyframe(CreateBuild.plane, attribute='translateX', t=[10, 20], v=-abs(value - 50)),
+                3: cmds.setKeyframe(CreateBuild.plane, attribute='translateX', t=[20, 30], v=-abs(value - 100)),
+                4: cmds.setKeyframe(CreateBuild.plane, attribute='translateX', t=[30, 40], v=-abs(value - 150)),
+                5: cmds.setKeyframe(CreateBuild.plane, attribute='translateX', t=[40, 50], v=-abs(value - 200)),
+                6: cmds.setKeyframe(CreateBuild.plane, attribute='translateX', t=[50, 60], v=-abs(value - 250)),
+            }
+        }
+        return clips
+
+
+def reset():
+    cmds.currentTime(1, edit=True)

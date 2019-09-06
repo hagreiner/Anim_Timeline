@@ -1,1 +1,3 @@
 WIDTH = 350
+
+SHADER_NAME = "Animated_PBR"
