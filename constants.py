@@ -1,3 +1,11 @@
 WIDTH = 350
 
 SHADER_NAME = "Animated_PBR"
+
+MAX_TIME = 1000
+
+MIN_TIME = 10
+
+MAX_X_DIST = 500
+
+MIN_X_DIST = 50

@@ -1,6 +1,7 @@
 import maya.cmds as cmds
 import maya.mel as mel
 from materials import AssignShader
+from constants import MAX_TIME
 
 
 class CreateBuild:
@@ -11,11 +12,11 @@ class CreateBuild:
         cube = cmds.polyCube(w=50, h=50, d=50, ch=False, name="cube_#")
         cmds.move(30 + 50, 25, 0, cube, relative=True)
         CreateBuild.cube = cube[0]
-        cmds.polyPlanarProjection(CreateBuild.cube, pc=(0, 0, 0), imageScale=(0.001, 0.001))
-        cmds.polyMoveUV(CreateBuild.cube, tu=-0.55, tv=-0.5)
-        cmds.select(CreateBuild.cube)
-        cmds.delete(ch=True)
-        AssignShader(object=CreateBuild.cube).add()
+        # cmds.polyPlanarProjection(CreateBuild.cube, pc=(0, 0, 0), imageScale=(0.001, 0.001))
+        # cmds.polyMoveUV(CreateBuild.cube, tu=-0.55, tv=-0.5)
+        # cmds.select(CreateBuild.cube)
+        # cmds.delete(ch=True)
+        # AssignShader(object=CreateBuild.cube).add()
         plane = cmds.polyPlane(w=50, h=50, ch=False, name="plane_#")
         cmds.move(-30 - 50, 0, 0, plane, relative=True)
         CreateBuild.plane = plane[0]
@@ -23,9 +24,11 @@ class CreateBuild:
 
 class Play:
     frameNum = 10
+    distX = 0
 
     def __init__(self):
         Play.frameNum = cmds.intSliderGrp("frameNum", query=True, value=True)
+        Play.distX = cmds.intSliderGrp("distanceX", query=True, value=True)
         cmds.playbackOptions( minTime='0sec', maxTime=str(Play.frameNum/30.0) + 'sec')
         try:
             delFrames(CreateBuild.cube)
@@ -52,7 +55,7 @@ class LoadClipOne:
         if direction == "forward":
             self.direction = 0
         else:
-            self.direction = 250
+            self.direction = Play.distX
         if object == CreateBuild.cube:
             self.object = "objectCube"
         if object == CreateBuild.plane:
@@ -67,24 +70,22 @@ class LoadClipOne:
 
 class ClipDictionary:
     def dicts(self, value):
-        print(Play.frameNum)
-        print(calcFrames())
         clips = {
             "objectCube": {
                 1: cmds.setKeyframe(CreateBuild.cube, attribute='translateX', t=[calcFrames()[0], calcFrames()[1]], v=abs(value)),
-                2: cmds.setKeyframe(CreateBuild.cube, attribute='translateX', t=[calcFrames()[1], calcFrames()[2]], v=abs(value - 50)),
-                3: cmds.setKeyframe(CreateBuild.cube, attribute='translateX', t=[calcFrames()[2], calcFrames()[3]], v=abs(value - 100)),
-                4: cmds.setKeyframe(CreateBuild.cube, attribute='translateX', t=[calcFrames()[3], calcFrames()[4]], v=abs(value - 150)),
-                5: cmds.setKeyframe(CreateBuild.cube, attribute='translateX', t=[calcFrames()[4], calcFrames()[5]], v=abs(value - 200)),
-                6: cmds.setKeyframe(CreateBuild.cube, attribute='translateX', t=[calcFrames()[5], calcFrames()[6]], v=abs(value - 250)),
+                2: cmds.setKeyframe(CreateBuild.cube, attribute='translateX', t=[calcFrames()[1], calcFrames()[2]], v=abs(value - (Play.distX / 5.0))),
+                3: cmds.setKeyframe(CreateBuild.cube, attribute='translateX', t=[calcFrames()[2], calcFrames()[3]], v=abs(value - 2*(Play.distX / 5.0))),
+                4: cmds.setKeyframe(CreateBuild.cube, attribute='translateX', t=[calcFrames()[3], calcFrames()[4]], v=abs(value - 3*(Play.distX / 5.0))),
+                5: cmds.setKeyframe(CreateBuild.cube, attribute='translateX', t=[calcFrames()[4], calcFrames()[5]], v=abs(value - 4*(Play.distX / 5.0))),
+                6: cmds.setKeyframe(CreateBuild.cube, attribute='translateX', t=[calcFrames()[5], calcFrames()[6]], v=abs(value - 5*(Play.distX / 5.0))),
             },
             "objectPlane": {
                 1: cmds.setKeyframe(CreateBuild.plane, attribute='translateX', t=[calcFrames()[0], calcFrames()[1]], v=-abs(value)),
-                2: cmds.setKeyframe(CreateBuild.plane, attribute='translateX', t=[calcFrames()[1], calcFrames()[2]], v=-abs(value - 50)),
-                3: cmds.setKeyframe(CreateBuild.plane, attribute='translateX', t=[calcFrames()[2], calcFrames()[3]], v=-abs(value - 100)),
-                4: cmds.setKeyframe(CreateBuild.plane, attribute='translateX', t=[calcFrames()[3], calcFrames()[4]], v=-abs(value - 150)),
-                5: cmds.setKeyframe(CreateBuild.plane, attribute='translateX', t=[calcFrames()[4], calcFrames()[5]], v=-abs(value - 200)),
-                6: cmds.setKeyframe(CreateBuild.plane, attribute='translateX', t=[calcFrames()[5], calcFrames()[6]], v=-abs(value - 250)),
+                2: cmds.setKeyframe(CreateBuild.plane, attribute='translateX', t=[calcFrames()[1], calcFrames()[2]], v=-abs(value - (Play.distX / 5.0))),
+                3: cmds.setKeyframe(CreateBuild.plane, attribute='translateX', t=[calcFrames()[2], calcFrames()[3]], v=-abs(value - 2*(Play.distX / 5.0))),
+                4: cmds.setKeyframe(CreateBuild.plane, attribute='translateX', t=[calcFrames()[3], calcFrames()[4]], v=-abs(value - 3*(Play.distX / 5.0))),
+                5: cmds.setKeyframe(CreateBuild.plane, attribute='translateX', t=[calcFrames()[4], calcFrames()[5]], v=-abs(value - 4*(Play.distX / 5.0))),
+                6: cmds.setKeyframe(CreateBuild.plane, attribute='translateX', t=[calcFrames()[5], calcFrames()[6]], v=-abs(value - 5*(Play.distX / 5.0))),
             }
         }
         return clips
@@ -100,4 +101,4 @@ def calcFrames():
 
 
 def delFrames(object):
-    cmds.cutKey(object, time=(0, 200), attribute='translateX', option="keys" )
+    cmds.cutKey(object, time=(0, MAX_TIME), attribute='translateX', option="keys" )

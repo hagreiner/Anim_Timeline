@@ -1,5 +1,5 @@
 import maya.cmds as cmds
-from constants import WIDTH, SHADER_NAME
+from constants import WIDTH, SHADER_NAME, MAX_TIME, MIN_TIME, MAX_X_DIST, MIN_X_DIST
 from timeLine import CreateBuild, Play
 from materials import CreateShader
 
@@ -21,6 +21,9 @@ def start():
 
 
 def end():
+    reset()
+    cmds.select(all=True)
+    cmds.delete()
     if cmds.window("window", exists=True):
         cmds.deleteUI("window", window=True)
 
@@ -45,7 +48,11 @@ class MainUI:
 
         cmds.rowColumnLayout(numberOfColumns=1, columnWidth=[(1, self.width)], parent=self.column)
         cmds.button(label="BUILD SCENE", command=lambda args: CreateBuild().buildObjects())
-        cmds.intSliderGrp("frameNum", label="Number of Frames", field=True, minValue=10, maxValue=200, value=10,
+        cmds.intSliderGrp("frameNum", label="Number of Frames", field=True,
+                          minValue=MIN_TIME, maxValue=MAX_TIME, value=MIN_TIME,
+                          columnWidth=[(1, 100), (2, 50), (3, WIDTH-125)],  cal=[1, "center"])
+        cmds.intSliderGrp("distanceX", label="X movement", field=True,
+                          minValue=MIN_X_DIST, maxValue=MAX_X_DIST, value=MIN_X_DIST,
                           columnWidth=[(1, 100), (2, 50), (3, WIDTH-125)],  cal=[1, "center"])
 
         cmds.rowColumnLayout(numberOfColumns=1, columnWidth=[(1, self.width)], parent=self.column)
