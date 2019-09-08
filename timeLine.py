@@ -94,6 +94,7 @@ class ClipDictionary:
 def reset():
     cmds.currentTime(0, edit=True)
 
+
 def calcFrames():
     return [
         0, Play.frameNum/6, (Play.frameNum/6)*2, (Play.frameNum/6)*3, (Play.frameNum/6)*4, (Play.frameNum/6)*5, (Play.frameNum/6)*6
