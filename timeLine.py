@@ -1,7 +1,6 @@
 import maya.cmds as cmds
-import maya.mel as mel
-from materials import AssignShader
 from constants import MAX_TIME
+from objects import Tree
 
 
 class CreateBuild:
@@ -9,17 +8,13 @@ class CreateBuild:
     plane = None
 
     def buildObjects(self):
-        cube = cmds.polyCube(w=50, h=50, d=50, ch=False, name="cube_#")
-        cmds.move(30 + 50, 25, 0, cube, relative=True)
-        CreateBuild.cube = cube[0]
-        # cmds.polyPlanarProjection(CreateBuild.cube, pc=(0, 0, 0), imageScale=(0.001, 0.001))
-        # cmds.polyMoveUV(CreateBuild.cube, tu=-0.55, tv=-0.5)
-        # cmds.select(CreateBuild.cube)
-        # cmds.delete(ch=True)
-        # AssignShader(object=CreateBuild.cube).add()
-        plane = cmds.polyPlane(w=50, h=50, ch=False, name="plane_#")
-        cmds.move(-30 - 50, 0, 0, plane, relative=True)
-        CreateBuild.plane = plane[0]
+        # cube = cmds.polyCube(w=50, h=50, d=50, ch=False, name="cube_#")
+        # cmds.move(30 + 50, 25, 0, cube, relative=True)
+        # CreateBuild.cube = cube[0]
+        # plane = cmds.polyPlane(w=50, h=50, ch=False, name="plane_#")
+        # cmds.move(-30 - 50, 0, 0, plane, relative=True)
+        # CreateBuild.plane = plane[0]
+        CreateBuild.cube = Tree().assemble()
 
 
 class Play:
@@ -63,9 +58,6 @@ class LoadClipOne:
 
     def load(self):
         (ClipDictionary().dicts(self.direction)[self.object]).keys()
-        # https://download.autodesk.com/us/maya/2009help/CommandsPython/setAttr.html
-        # https://lesterbanks.com/2018/04/animate-textures-objects-maya/
-        # https: // www.youtube.com / watch?v = UnGvFIQVfZ4
 
 
 class ClipDictionary:
@@ -102,4 +94,4 @@ def calcFrames():
 
 
 def delFrames(object):
-    cmds.cutKey(object, time=(0, MAX_TIME), attribute='translateX', option="keys" )
+    cmds.cutKey(object, time=(0, MAX_TIME), attribute='translateX', option="keys")
