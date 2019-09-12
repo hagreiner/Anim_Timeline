@@ -3,39 +3,56 @@ from constants import T_HEIGHT, T_WIDTH, BASE_HEIGHT
 import random
 
 
+# def clear():
+#     Lines.bodyCurve = None
+#     Lines.trunkPoints = []
+#     Lines.x = 0
+#     Lines.y = 0
+#     Meshes.base = None
+
+
 class Tree:
     def __init__(self):
         self.sx = 8
         self.treeLoops = 5
-        self.randomList = list(range(-20, 20))
+        self.smallMove = (list(range(-100, 100)))
         self.trunkMove = list(range(-5, 5))
         self.y_movement = (T_HEIGHT - BASE_HEIGHT) / self.treeLoops
+        self.armLength = list(range(20, 50))
+        self.armWidth = list(range(5, 10))
+        self.moveArm = findPosition()
 
     def assemble(self):
         Meshes().body()
         Lines().body()
         Unique().body()
+        CreateArms().make()
+        return Lines.bodyCurve
 
 
 class Lines(Tree):
+    bodyCurve = None
+    armCurve1 = None
+    armCurve2 = None
     trunkPoints = []
-    x = 0
-    z = 0
+    arm1Points = []
+    arm2Points = []
 
     def body(self):
-
-        for y in range(self.treeLoops):
-            random_move_X = random.choice(self.randomList)
-            random_move_Z = random.choice(self.randomList)
-            point = self.x + random_move_X, self.y_movement*y + BASE_HEIGHT, self.x + random_move_Z
-            self.x = random_move_X
-            self.z = random_move_Z
-            Lines.trunkPoints.append(point)
-            for num in range(200):
-                self.randomList.append(num - 100)
-        extrudeCurve = cmds.curve(p=Lines.trunkPoints)
+        point_1 = 0, BASE_HEIGHT, 0
+        Lines.trunkPoints.append(point_1)
+        point_2 = 20, self.y_movement*1, 0
+        Lines.trunkPoints.append(point_2)
+        point_3 = 0, self.y_movement*2, 20
+        Lines.trunkPoints.append(point_3)
+        point_4 = 20, self.y_movement*3, 0
+        Lines.trunkPoints.append(point_4)
+        point_5 = 0, self.y_movement*4, 20
+        Lines.trunkPoints.append(point_5)
+        Lines.bodyCurve = cmds.curve(p=Lines.trunkPoints)
         cmds.polyExtrudeFacet(
-            Meshes.base + '.f[' + str(self.sx + 1) + ']', inputCurve=extrudeCurve, divisions=18, rx=90, ch=False)
+            Meshes.base + '.f[' + str(self.sx + 1) + ']', ls=(0.2, 0.2, 0.2), inputCurve=Lines.bodyCurve, divisions=15,
+            rx=90, ch=False)
 
     def arms(self):
         pass
@@ -46,14 +63,10 @@ class Lines(Tree):
 
 class Meshes(Tree):
     base = None
-
     def body(self):
         base = cmds.polyCylinder(r=T_WIDTH, h=BASE_HEIGHT, subdivisionsAxis=self.sx, ch=False)
         cmds.move(0, BASE_HEIGHT/2.0, 0, base, relative=True)
         Meshes.base = base[0]
-
-    def limbs(self):
-        pass
 
 
 class Unique(Tree):
@@ -61,7 +74,37 @@ class Unique(Tree):
         cmds.scale(2, 1, 2, Meshes.base + ".f[" + str(self.sx) + "]")
         for edge in range(self.sx):
             cmds.move(0, 0, random.choice(self.trunkMove), Meshes.base + ".e[" + str(edge) + "]", relative=True)
+        cmds.select(Meshes.base)
+        loopNum = cmds.polyEvaluate(v=True)
+        cmds.select(clear=True)
+        for vtx in range(loopNum):
+            cmds.move(random.choice(self.smallMove)/100.0, random.choice(self.smallMove)/100.0,
+                      random.choice(self.smallMove)/100.0, Meshes.base + ".vtx[" + str(vtx) + "]", relative=True)
 
+
+class CreateArms(Tree):
+    def make(self):
+        for x in range(5):
+            arm = cmds.polyCylinder(r=random.choice(self.armWidth), h=1, ch=False, name="arm_#")
+            cmds.rotate(0, 0, 90, arm)
+            cmds.move(0, random.choice(self.moveArm), 0, arm)
+            Lines().arms()
+
+
+def findPosition():
+    cmds.select(Meshes.base)
+    X, Y, Z = cmds.polyEvaluate(v=True)
+    cmds.select(clear=True)
+
+
+    """
+    [18] ;
+select -tgl pCylinder1.f[36] ;
+select -tgl pCylinder1.f[44] ;
+select -tgl pCylinder1.f[103] ;
+select -tgl pCylinder1.f[97] 
+    :return: 
+    """
 """
 exp = 0.75
     radR = 1
