@@ -8,6 +8,4 @@ MAX_Y_DIST = 1000
 
 MIN_Y_DIST = 3
 
-DIV_NUM = 100
-
-DIV = 8
+DIV = 20
