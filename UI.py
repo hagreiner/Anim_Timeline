@@ -59,7 +59,7 @@ class MainUI:
 
         cmds.rowColumnLayout(numberOfColumns=1, columnWidth=[(1, self.width)], parent=self.column)
         cmds.button(label="PLAY", command=lambda args: Play().forwards())
-        cmds.button(label="REVERSE", command=lambda args: Play().backwards())
+        # cmds.button(label="REVERSE", command=lambda args: Play().backwards())
         cmds.button(label="STOP", command=lambda args: Play().stop())
         cmds.button(label="RESET", command=lambda args: reset())
         cmds.button(label="QUIT", command=lambda args: end())
