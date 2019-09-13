@@ -1,5 +1,5 @@
 import maya.cmds as cmds
-from constants import WIDTH, MAX_TIME, MIN_TIME, MAX_X_DIST, MIN_X_DIST
+from constants import WIDTH, MAX_TIME, MIN_TIME, MAX_Y_DIST, MIN_Y_DIST
 from timeLine import CreateBuild, Play
 
 
@@ -47,8 +47,14 @@ class MainUI:
         cmds.intSliderGrp("frameNum", label="Number of Frames", field=True,
                           minValue=MIN_TIME, maxValue=MAX_TIME, value=MIN_TIME,
                           columnWidth=[(1, 100), (2, 50), (3, WIDTH-125)],  cal=[1, "center"])
-        cmds.intSliderGrp("distanceX", label="X movement", field=True,
-                          minValue=MIN_X_DIST, maxValue=MAX_X_DIST, value=MIN_X_DIST,
+        cmds.intSliderGrp("numWaves", label="Number of Waves", field=True,
+                          minValue=1, maxValue=10, value=1,
+                          columnWidth=[(1, 100), (2, 50), (3, WIDTH-125)],  cal=[1, "center"])
+        cmds.intSliderGrp("distanceYMax", label="Y Max", field=True,
+                          minValue=MIN_Y_DIST, maxValue=MAX_Y_DIST, value=MIN_Y_DIST,
+                          columnWidth=[(1, 100), (2, 50), (3, WIDTH-125)],  cal=[1, "center"])
+        cmds.intSliderGrp("distanceYMin", label="Y Min", field=True,
+                          minValue=MIN_Y_DIST, maxValue=MAX_Y_DIST, value=MIN_Y_DIST,
                           columnWidth=[(1, 100), (2, 50), (3, WIDTH-125)],  cal=[1, "center"])
 
         cmds.rowColumnLayout(numberOfColumns=1, columnWidth=[(1, self.width)], parent=self.column)
