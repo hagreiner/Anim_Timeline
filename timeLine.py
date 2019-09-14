@@ -1,6 +1,6 @@
 import maya.cmds as cmds
 from constants import MAX_TIME, DIV
-from objects import Plane
+from objects import Plane, StaticObjects
 import random
 
 
@@ -9,6 +9,7 @@ class CreateBuild:
 
     def buildObjects(self):
         CreateBuild.water = Plane().make()
+        StaticObjects().make()
 
 
 class Play:
@@ -51,7 +52,10 @@ class LoadClipOne:
 
     def load(self):
         for wave in range(Play.waveCount):
-            makeFramesWater()
+            MakeFramesWater(inputY=wave).make()
+
+        if Play.waveCount > 1:
+            findFrames()
 
 
 def reset():
@@ -59,26 +63,45 @@ def reset():
 
 
 def delFrames():
-    for y in range((DIV + 1)*9):
+    for y in range(440):
         cmds.cutKey(CreateBuild.water + ".pt[" + str(y) + "].py", time=(0, MAX_TIME), option="keys")
 
 
-def makeFramesWater():
-    for y in range(20):
-        for x in range(440):
-            cmds.setKeyframe(CreateBuild.water + ".pt[" + str(x) + "].py", cp=True, breakdown=True,
-                             t=[calcFrames()[y], calcFrames()[y + 10]], v=0)
-            cmds.setKeyframe(CreateBuild.water + ".pt[" + str(x) + "].py", cp=True, breakdown=True,
-                             t=[calcFrames()[y + 10], calcFrames()[y + 20]], v=-(random.choice(determineRange()))/4.0)
+class MakeFramesWater:
+    def __init__(self, inputY):
+        self.input = inputY
+        self.y = inputY
+        self.boolList = [-1, 0, 1]
+        self.offsetList = list(range(0, 5))
 
+    def make(self):
+        for x in range(441):
+            self.y += random.choice(self.offsetList)
+            value = (random.choice(determineRange()) * random.choice(self.boolList))
+            # cmds.setKeyframe(CreateBuild.water + ".pt[" + str(x) + "].py", cp=True, breakdown=True,
+            #                  t=[calcFrames()[self.y], calcFrames()[self.y + 1]], v=0)
             cmds.setKeyframe(CreateBuild.water + ".pt[" + str(x) + "].py", cp=True, breakdown=True,
-                             t=[calcFrames()[y + 20], calcFrames()[y + 30]], v=random.choice(determineRange()))
-            cmds.setKeyframe(CreateBuild.water + ".pt[" + str(x) + "].py", cp=True, breakdown=True,
-                             t=[calcFrames()[y + 30], calcFrames()[y + 40]], v=0)
+                             t=[calcFrames()[self.y], calcFrames()[self.y + 10]],
+                             v=value)
+            # cmds.setKeyframe(CreateBuild.water + ".pt[" + str(x) + "].py", cp=True, breakdown=True,
+            #                      t=[calcFrames()[self.y + 12], calcFrames()[self.y + 12]], v=0)
+            self.y = self.input
+
+
+def findFrames():
+    for x in range(441):
+        frame = cmds.findKeyframe(CreateBuild.water + ".pt[" + str(x) + "].py", time=(0, MAX_TIME), which="first")
+        cmds.selectKey(CreateBuild.water + ".pt[" + str(x) + "].py", time=(frame, frame))
+        value = cmds.keyframe(query=True, sl=True, valueChange=True)
+        value = float(value[0])
+        cmds.setKeyframe(CreateBuild.water + ".pt[" + str(x) + "].py", cp=True, breakdown=True,
+                         time=(calcFrames()[-1], calcFrames()[-1]), v=value)
+        # cmds.copyKey(CreateBuild.water + ".pt[" + str(x) + "].py", time=(frame, frame))
+        # cmds.pasteKey(CreateBuild.water + ".pt[" + str(x) + "].py", time=(calcFrames()[-1], calcFrames()[-1]))
 
 
 def calcFrames():
-    frames = 60
+    frames = 25
     returnList = []
     for x in range(frames):
         returnList.append(((Play.frameNum/frames)*x))

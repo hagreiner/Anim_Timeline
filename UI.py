@@ -48,7 +48,7 @@ class MainUI:
                           minValue=MIN_TIME, maxValue=MAX_TIME, value=MIN_TIME,
                           columnWidth=[(1, 100), (2, 50), (3, WIDTH-125)],  cal=[1, "center"])
         cmds.intSliderGrp("numWaves", label="Number of Waves", field=True,
-                          minValue=1, maxValue=10, value=1,
+                          minValue=1, maxValue=20, value=1,
                           columnWidth=[(1, 100), (2, 50), (3, WIDTH-125)],  cal=[1, "center"])
         cmds.intSliderGrp("distanceYMax", label="Y Max", field=True,
                           minValue=MIN_Y_DIST, maxValue=MAX_Y_DIST, value=MIN_Y_DIST,
