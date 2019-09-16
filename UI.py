@@ -1,5 +1,5 @@
 import maya.cmds as cmds
-from constants import WIDTH, MAX_TIME, MIN_TIME, MAX_Y_DIST, MIN_Y_DIST, WATER, ROCKS, GRASS, L_RED
+from constants import WIDTH, MAX_TIME, MIN_TIME, MAX_Y_DIST, MIN_Y_DIST, WATER, ROCKS, GRASS, L_RED, BIRD
 from timeLine import CreateBuild, Play
 from colors import AssignColor
 
@@ -22,6 +22,8 @@ def start():
         AssignColor().grass()
     if cmds.objExists(L_RED) == False:
         AssignColor().lred()
+    if cmds.objExists(BIRD) == False:
+        AssignColor().bird()
 
     MainUI().baseUI()
 

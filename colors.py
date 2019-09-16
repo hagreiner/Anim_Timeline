@@ -1,5 +1,5 @@
 import maya.cmds as cmds
-from constants import WATER, ROCKS, GRASS, L_RED
+from constants import WATER, ROCKS, GRASS, L_RED, BIRD
 
 
 class AssignColor:
@@ -33,3 +33,10 @@ class AssignColor:
         shdSG = cmds.sets(name='%sSG' % shd, empty=True, renderable=True, noSurfaceShader=True)
         cmds.connectAttr('%s.outColor' % shd, '%s.surfaceShader' % shdSG)
         cmds.sets(L_RED, e=True, forceElement=shdSG)
+
+    def bird(self):
+        shd = cmds.shadingNode('lambert', name=BIRD, asShader=True)
+        cmds.setAttr(shd + ".color", 0.84, 0.84, 1.0, type='double3')
+        shdSG = cmds.sets(name='%sSG' % shd, empty=True, renderable=True, noSurfaceShader=True)
+        cmds.connectAttr('%s.outColor' % shd, '%s.surfaceShader' % shdSG)
+        cmds.sets(BIRD, e=True, forceElement=shdSG)

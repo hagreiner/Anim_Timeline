@@ -1,19 +1,19 @@
 import maya.cmds as cmds
 from constants import MAX_TIME, DIV
-from objects import Plane, StaticObjects, Curves
+from objects import Plane, StaticObjects, Curves, Bird
 import random
 
 
 class CreateBuild:
     water = None
     curve = None
-    temp = None
+    bird = None
 
     def buildObjects(self):
         CreateBuild.water = Plane().make()
         StaticObjects().make()
         CreateBuild.curve = Curves().create()
-        CreateBuild.temp = cmds.polyCube(w=20, h=20, d=20, ch=False)
+        CreateBuild.bird = Bird().make()
 
 
 class Play:
@@ -76,7 +76,7 @@ def delFrames():
 
 
 def delCurveFrames():
-    cmds.select(CreateBuild.temp)
+    cmds.select(CreateBuild.bird)
     cmds.delete(mp=True)
 
 
@@ -102,14 +102,8 @@ class MakeFramesWater:
 
 
 class AnimCurve:
-    def __init__(self):
-        pass
-
     def anim(self):
-        cmds.pathAnimation(CreateBuild.temp[0], c=CreateBuild.curve, stu=0, etu=Play.frameNum)
-    """
-    pathAnimation -fractionMode true -follow true -followAxis x -upAxis y -worldUpType "vector" -worldUpVector 0 1 0 -inverseUp false -inverseFront false -bank false -startTimeU `playbackOptions -query -minTime` -endTimeU  `playbackOptions -query -maxTime`;
-    """
+        cmds.pathAnimation(CreateBuild.bird, c=CreateBuild.curve, stu=0, etu=Play.frameNum, f=True)
 
 
 def findFrames():

@@ -1,8 +1,8 @@
 import maya.cmds as cmds
-from constants import DIV, MAX_Y_DIST, WATER, ROCKS, GRASS, L_RED
+from constants import DIV, MAX_Y_DIST, WATER, ROCKS, GRASS, L_RED, BIRD
 import random
 
-# sets -e -forceElement WATERCOLORSG
+
 class Plane:
     def __init__(self):
         self.width = 1000
@@ -23,10 +23,78 @@ class Plane:
 
 class Curves:
     def __init__(self):
-        pass
+        r = 100
+        self.pointList = packPoints([])
 
     def create(self):
-        return cmds.curve(p=[(0, 100, 0), (50, 50, 0), (0, 50, 50), (0, 150, 50)])
+        curve = cmds.curve(p=self.pointList)
+        cmds.scale(20, 20, 20, curve, relative=True)
+        cmds.move(80, 400, -230, curve, relative=True)
+        cmds.rotate(0, 0, -90, curve)
+        return curve
+
+
+def packPoints(pointList):
+    exp = 0.75
+    numLoops = 5
+    y_dist_mult = 5
+
+    valDict = {}
+    randMoveList = [0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, -0.5, -0.6, -0.7, -0.8, -0.9, -1.0, -1.1]
+
+    for x in range(5):
+        inputVal = (exp + x) ** 2
+        valDict[x] = inputVal
+
+    x = 0
+    for y in range(numLoops):
+        random_move_1 = random.choice(randMoveList)
+        random_move_2 = random.choice(randMoveList)
+        random_move_3 = random.choice(randMoveList)
+        random_move_4 = random.choice(randMoveList)
+        random_move_5 = random.choice(randMoveList)
+        point_1 = x, 0, 0
+        if y == 0:
+            first = point_1
+        point_2 = x + random_move_1, y_dist_mult * 1, valDict[0]
+        point_3 = x, y_dist_mult * 2, valDict[1]
+        point_4 = x, y_dist_mult * 3, valDict[2]
+        point_5 = x + random_move_2, y_dist_mult * 3, valDict[3] + valDict[1]
+        if y == (numLoops/2):
+            second = point_5
+        point_6 = x, y_dist_mult * 2, valDict[3] + valDict[2]
+        point_7 = x, y_dist_mult * 1, valDict[3] + valDict[2] + valDict[1]
+        point_8 = x + random_move_3, 0, valDict[3] + valDict[2] + valDict[1] + valDict[0]
+        point_9 = x, -y_dist_mult * 1, valDict[3] + valDict[2] + valDict[1]
+        pointList.append(point_1)
+        pointList.append(point_2)
+        pointList.append(point_3)
+        pointList.append(point_4)
+        pointList.append(point_5)
+        pointList.append(point_6)
+        pointList.append(point_7)
+        pointList.append(point_8)
+        pointList.append(point_9)
+        if (y + 1) == numLoops:
+            point_10 = x, -y_dist_mult * 4, valDict[3] + valDict[2] + valDict[1]
+            pointList.append(point_10)
+
+            pointList.append(second)
+            pointList.append(first)
+            break
+        else:
+            point_10 = x + random_move_4, -y_dist_mult * 2, valDict[3] + valDict[2]
+            point_11 = x, -y_dist_mult * 3, valDict[3] + valDict[1]
+            point_12 = x, -y_dist_mult * 3, valDict[2]
+            point_13 = x + random_move_5, -y_dist_mult * 2, valDict[1]
+            point_14 = x, -y_dist_mult * 1, valDict[0]
+            pointList.append(point_10)
+            pointList.append(point_11)
+            pointList.append(point_12)
+            pointList.append(point_13)
+            pointList.append(point_14)
+        x += 3.2
+    return pointList
 
 
 class StaticObjects(Plane):
@@ -80,6 +148,34 @@ class StaticObjects(Plane):
         cmds.polyExtrudeFacet(lighthouse + ".f[50:57]", ltz=-2)
         cmds.select(lighthouse + ".f[50:57]")
         cmds.hyperShade(assign=WATER)
+
+
+class Bird:
+    def make(self):
+        bird = cmds.polyCylinder(r=3, h=5, ch=False, sx=6)
+        bird = bird[0]
+        topFaceB = bird + ".f[7]"
+        bottomFaceB = bird + ".f[6]"
+        sideFaces = bird + ".f[4:5]"
+        cmds.polyExtrudeFacet(topFaceB, offset=1, ltx=0.66, ltz=3)
+        cmds.polyExtrudeFacet(topFaceB, offset=-1, ltz=1.2)
+        cmds.polyExtrudeFacet(topFaceB, offset=-0.2, ltz=1.2)
+        cmds.polyExtrudeFacet(topFaceB, offset=0.2, ltz=1.2)
+        cmds.polyExtrudeFacet(topFaceB, offset=0.5, ltz=1.2)
+        cmds.polyExtrudeFacet(topFaceB, offset=1.5, ltz=1.2, ltx=0.5)
+        cmds.polyExtrudeFacet(topFaceB, offset=0.5, ltz=2.4)
+        cmds.polyExtrudeFacet(bottomFaceB, offset=1.0, ltz=2.4, ltx=0.6)
+        cmds.polyExtrudeFacet(bottomFaceB, lsx=0.3, ltz=4, ltx=0.6)
+        cmds.polyExtrudeFacet(bottomFaceB, lsy=1.2, ltz=4, ltx=0.6)
+        cmds.polyExtrudeFacet(sideFaces, lsx=0.1, keepFacesTogether=0)
+        cmds.polyExtrudeFacet(sideFaces, ltz=4, keepFacesTogether=0)
+        cmds.polyExtrudeFacet(bird + ".f[4]", lsy=0.1, ltz=8, lty=-3, keepFacesTogether=0)
+        cmds.polyExtrudeFacet(bird + ".f[5]", lsy=0.1, ltz=8, lty=3, keepFacesTogether=0)
+        cmds.move(0, 350, 0, bird)
+        cmds.rotate(180, 0, 90, bird, relative=True)
+        cmds.select(bird)
+        cmds.hyperShade(assign=BIRD)
+        return bird
 
 
 def randomVTX(object, vlist, moveList):
