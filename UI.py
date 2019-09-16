@@ -1,6 +1,7 @@
 import maya.cmds as cmds
-from constants import WIDTH, MAX_TIME, MIN_TIME, MAX_Y_DIST, MIN_Y_DIST
+from constants import WIDTH, MAX_TIME, MIN_TIME, MAX_Y_DIST, MIN_Y_DIST, WATER, ROCKS, GRASS, L_RED
 from timeLine import CreateBuild, Play
+from colors import AssignColor
 
 
 def start():
@@ -12,6 +13,15 @@ def start():
 
     cmds.currentUnit(time='ntsc')
     reset()
+
+    if cmds.objExists(WATER) == False:
+        AssignColor().water()
+    if cmds.objExists(ROCKS) == False:
+        AssignColor().rocks()
+    if cmds.objExists(GRASS) == False:
+        AssignColor().grass()
+    if cmds.objExists(L_RED) == False:
+        AssignColor().lred()
 
     MainUI().baseUI()
 
@@ -48,7 +58,7 @@ class MainUI:
                           minValue=MIN_TIME, maxValue=MAX_TIME, value=MIN_TIME,
                           columnWidth=[(1, 100), (2, 50), (3, WIDTH-125)],  cal=[1, "center"])
         cmds.intSliderGrp("numWaves", label="Number of Waves", field=True,
-                          minValue=1, maxValue=20, value=1,
+                          minValue=5, maxValue=10, value=5,
                           columnWidth=[(1, 100), (2, 50), (3, WIDTH-125)],  cal=[1, "center"])
         cmds.intSliderGrp("distanceYMax", label="Y Max", field=True,
                           minValue=MIN_Y_DIST, maxValue=MAX_Y_DIST, value=MIN_Y_DIST,

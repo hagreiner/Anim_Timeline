@@ -1,15 +1,19 @@
 import maya.cmds as cmds
 from constants import MAX_TIME, DIV
-from objects import Plane, StaticObjects
+from objects import Plane, StaticObjects, Curves
 import random
 
 
 class CreateBuild:
     water = None
+    curve = None
+    temp = None
 
     def buildObjects(self):
         CreateBuild.water = Plane().make()
         StaticObjects().make()
+        CreateBuild.curve = Curves().create()
+        CreateBuild.temp = cmds.polyCube(w=20, h=20, d=20, ch=False)
 
 
 class Play:
@@ -26,18 +30,20 @@ class Play:
         cmds.playbackOptions(minTime='0sec', maxTime=str(Play.frameNum/30.0) + 'sec')
         try:
             delFrames()
+            delCurveFrames()
         except:
             pass
+
 
     def forwards(self):
         Play().stop()
         LoadClipOne(direction="forward").load()
         cmds.play(forward=True)
 
-    def backwards(self):
-        Play().stop()
-        LoadClipOne(direction="backwards").load()
-        cmds.play(forward=True)
+    # def backwards(self):
+    #     Play().stop()
+    #     LoadClipOne(direction="backwards").load()
+    #     cmds.play(forward=True)
 
     def stop(self):
         cmds.play(state=False)
@@ -57,6 +63,8 @@ class LoadClipOne:
         if Play.waveCount > 1:
             findFrames()
 
+        AnimCurve().anim()
+
 
 def reset():
     cmds.currentTime(0, edit=True)
@@ -65,6 +73,11 @@ def reset():
 def delFrames():
     for y in range(440):
         cmds.cutKey(CreateBuild.water + ".pt[" + str(y) + "].py", time=(0, MAX_TIME), option="keys")
+
+
+def delCurveFrames():
+    cmds.select(CreateBuild.temp)
+    cmds.delete(mp=True)
 
 
 class MakeFramesWater:
@@ -86,6 +99,17 @@ class MakeFramesWater:
             # cmds.setKeyframe(CreateBuild.water + ".pt[" + str(x) + "].py", cp=True, breakdown=True,
             #                      t=[calcFrames()[self.y + 12], calcFrames()[self.y + 12]], v=0)
             self.y = self.input
+
+
+class AnimCurve:
+    def __init__(self):
+        pass
+
+    def anim(self):
+        cmds.pathAnimation(CreateBuild.temp[0], c=CreateBuild.curve, stu=0, etu=Play.frameNum)
+    """
+    pathAnimation -fractionMode true -follow true -followAxis x -upAxis y -worldUpType "vector" -worldUpVector 0 1 0 -inverseUp false -inverseFront false -bank false -startTimeU `playbackOptions -query -minTime` -endTimeU  `playbackOptions -query -maxTime`;
+    """
 
 
 def findFrames():
