@@ -53,8 +53,14 @@ class MainUI:
 
     def baseUI(self):
         cmds.columnLayout(self.column, parent=self.typeWin)
-
         cmds.rowColumnLayout(numberOfColumns=1, columnWidth=[(1, self.width)], parent=self.column)
+
+        cmds.text("Select The Bird's Path Type")
+        cmds.radioCollection('floorSizedRadioCollection')
+        cmds.radioButton('linCurve', label='Linear', sl=True)
+        cmds.radioButton('swoopCurve', label='Swoop', sl=False)
+        cmds.radioButton('circleCurve', label='Circle', sl=False)
+
         cmds.button(label="BUILD SCENE", command=lambda args: CreateBuild().buildObjects())
         cmds.intSliderGrp("frameNum", label="Number of Frames", field=True,
                           minValue=MIN_TIME, maxValue=MAX_TIME, value=MIN_TIME,
