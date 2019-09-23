@@ -26,12 +26,25 @@ class Curves:
         r = 100
         self.pointList = packPoints([])
 
-    def create(self):
+    def circle(self):
         curve = cmds.curve(p=self.pointList)
         cmds.scale(20, 20, 20, curve, relative=True)
         cmds.move(80, 400, -230, curve, relative=True)
         cmds.rotate(0, 0, -90, curve)
         return curve
+
+    def swoop(self):
+        return cmds.curve(p=[
+            (200, MAX_Y_DIST, -400),
+            (200, MAX_Y_DIST + 100, -200),
+            (200,  MAX_Y_DIST + 300, 0),
+            (-200,  MAX_Y_DIST + 600, 400),
+            (-300,  MAX_Y_DIST + 600, 400),
+            (200, MAX_Y_DIST + 300, 0),
+            (200, MAX_Y_DIST + 100, -200),
+            (250, MAX_Y_DIST, -400),
+            (200, MAX_Y_DIST, -400),
+            ])
 
 
 def packPoints(pointList):
@@ -171,14 +184,52 @@ class Bird:
         cmds.polyExtrudeFacet(sideFaces, ltz=4, keepFacesTogether=0)
         cmds.polyExtrudeFacet(bird + ".f[4]", lsy=0.1, ltz=8, lty=-3, keepFacesTogether=0)
         cmds.polyExtrudeFacet(bird + ".f[5]", lsy=0.1, ltz=8, lty=3, keepFacesTogether=0)
-        cmds.move(0, 350, 0, bird)
-        cmds.rotate(180, 0, 90, bird, relative=True)
+        cmds.rotate(180, 0, 180, bird, relative=True)
         cmds.select(bird)
         cmds.hyperShade(assign=BIRD)
-        return bird
+
+        wing = cmds.duplicate(bird)
+        cmds.delete(wing[0] + ".f[0:4]", wing[0] + ".f[6:79]", wing[0] + ".f[84:87]")
+        cmds.delete(bird + ".f[4:5]", bird + ".f[76:77]", bird + ".f[79:81]", bird + ".f[83:91]")
+        cmds.delete(bird + ".f[74:75]")
+
+        cmds.scale(1.2, 1.2, 1.2, wing, relative=True)
+        cmds.move(0, -0.6, -0.3, wing, relative=True)
+        x2, y2, z2 = findPos(wing[0] + ".f[4]")
+        x3, y3, z3 = findPos(wing[0] + ".f[8]")
+
+        cmds.select(d=True)
+        cmds.joint(p=(0, 0, 0))
+        cmds.joint(p=(x2, y2, z2))
+        cmds.joint('joint1', e=True, zso=True, oj='xyz')
+        cmds.joint(p=(x3, y3, z3))
+        cmds.joint('joint2', e=True, zso=True, oj='xyz')
+        cmds.makeIdentity(bird, a=True)
+        cmds.makeIdentity(wing, a=True)
+        cmds.skinCluster('joint1', 'joint3', wing, tsb=True)
+
+        cmds.polyMirrorFace(wing, mirrorAxis=2, axis=2)
+        cmds.polyCloseBorder(bird)
+        returnGroup = cmds.group(bird, wing, relative=True)
+
+        return returnGroup, "joint2"
 
 
 def randomVTX(object, vlist, moveList):
     for vtx in vlist:
         cmds.move(random.choice(moveList), random.choice(moveList), random.choice(moveList),
                   object + ".f[" + str(vtx) + "]", relative=True)
+
+
+def findPos(objectFace):
+    cmds.select(objectFace)
+    X, Y, Z = cmds.polyEvaluate(bc=True)
+    x1, x2 = X
+    xPos = (x1 + x2)/2.0
+    y1, y2 = Y
+    yPos = (y1 + y2)/2.0
+    cmds.select(clear=True)
+    z1, z2 = Z
+    zPos = (z1 + z2)/2.0
+    cmds.select(clear=True)
+    return xPos, yPos, zPos

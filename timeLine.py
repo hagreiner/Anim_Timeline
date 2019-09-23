@@ -8,12 +8,22 @@ class CreateBuild:
     water = None
     curve = None
     bird = None
+    birdJoint = None
+
+    def __init__(self):
+        # self.linearCurve = cmds.radioButton("linCurve", query=True, select=True)
+        self.swoopCurve = cmds.radioButton("swoopCurve", query=True, select=True)
+        self.circleCurve = cmds.radioButton("circleCurve", query=True, select=True)
 
     def buildObjects(self):
         CreateBuild.water = Plane().make()
         StaticObjects().make()
-        CreateBuild.curve = Curves().create()
-        CreateBuild.bird = Bird().make()
+        if self.circleCurve == True:
+            CreateBuild.curve = Curves().circle()
+        if self.swoopCurve == True:
+            CreateBuild.curve = Curves().swoop()
+        CreateBuild.bird, CreateBuild.birdJoint = Bird().make()
+        # cmds.rotate(0, -80, 0, CreateBuild.birdJoint, relative=True)
 
 
 class Play:
@@ -31,6 +41,7 @@ class Play:
         try:
             delFrames()
             delCurveFrames()
+            delBoneFrames()
         except:
             pass
 
@@ -63,6 +74,7 @@ class LoadClipOne:
         if Play.waveCount > 1:
             findFrames()
 
+        AnimBones().anim()
         AnimCurve().anim()
 
 
@@ -78,6 +90,10 @@ def delFrames():
 def delCurveFrames():
     cmds.select(CreateBuild.bird)
     cmds.delete(mp=True)
+
+
+def delBoneFrames():
+    cmds.cutKey(CreateBuild.birdJoint, time=(0, MAX_TIME), option="keys")
 
 
 class MakeFramesWater:
@@ -103,7 +119,22 @@ class MakeFramesWater:
 
 class AnimCurve:
     def anim(self):
-        cmds.pathAnimation(CreateBuild.bird, c=CreateBuild.curve, stu=0, etu=Play.frameNum, f=True)
+        cmds.pathAnimation(CreateBuild.bird, c=CreateBuild.curve, stu=0, etu=Play.frameNum, f=True, ua="z", fm=True,
+                           bankScale=-4, fa='y')
+        # cmds.pathAnimation(CreateBuild.bird, c=CreateBuild.curve, stu=0, etu=Play.frameNum, f=True, ua="x", fm=True,
+        #                    bankScale=-90)
+
+
+class AnimBones:
+    def anim(self):
+        value = 0
+        for x in range(len(calcFrames()) - 1):
+            if x%2 == 0:
+                value = 0
+            if x%2 == 1:
+                value = 1
+            cmds.setKeyframe(CreateBuild.birdJoint + ".rotate", cp=True, breakdown=True, at="rotationY",
+                             time=(calcFrames()[x], calcFrames()[x+1]), v=70*value)
 
 
 def findFrames():
@@ -114,8 +145,6 @@ def findFrames():
         value = float(value[0])
         cmds.setKeyframe(CreateBuild.water + ".pt[" + str(x) + "].py", cp=True, breakdown=True,
                          time=(calcFrames()[-1], calcFrames()[-1]), v=value)
-        # cmds.copyKey(CreateBuild.water + ".pt[" + str(x) + "].py", time=(frame, frame))
-        # cmds.pasteKey(CreateBuild.water + ".pt[" + str(x) + "].py", time=(calcFrames()[-1], calcFrames()[-1]))
 
 
 def calcFrames():
@@ -133,6 +162,3 @@ def determineRange():
         return list(range(Play.distYMax, Play.distYMin))
     else:
         return [Play.distYMax, Play.distYMax]
-
-
-# CreateBuild.cube + ".controlPoints[" + str(x) + "].yValue"

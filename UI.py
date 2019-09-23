@@ -57,8 +57,7 @@ class MainUI:
 
         cmds.text("Select The Bird's Path Type")
         cmds.radioCollection('floorSizedRadioCollection')
-        cmds.radioButton('linCurve', label='Linear', sl=True)
-        cmds.radioButton('swoopCurve', label='Swoop', sl=False)
+        cmds.radioButton('swoopCurve', label='Swoop', sl=True)
         cmds.radioButton('circleCurve', label='Circle', sl=False)
 
         cmds.button(label="BUILD SCENE", command=lambda args: CreateBuild().buildObjects())
