@@ -1,7 +1,6 @@
 import maya.cmds as cmds
-from constants import WIDTH, SHADER_NAME, MAX_TIME, MIN_TIME, MAX_X_DIST, MIN_X_DIST
+from constants import WIDTH, MAX_TIME, MIN_TIME, MAX_X_DIST, MIN_X_DIST
 from timeLine import CreateBuild, Play
-from materials import CreateShader
 
 
 def start():
@@ -10,9 +9,6 @@ def start():
 
     if cmds.window("props", exists=True):
         cmds.deleteUI("props", window=True)
-
-    if cmds.objExists(SHADER_NAME) == False:
-        CreateShader().create()
 
     cmds.currentUnit(time='ntsc')
     reset()

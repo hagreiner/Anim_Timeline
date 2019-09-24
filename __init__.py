@@ -9,11 +9,11 @@ Step Two:
 Step Three:
     Paste the code below into a Python tab (NOT THE MEL ONE!! IT WONT WORK)
 
-from Anim_Timeline import UI, constants, timeLine, materials
+from Anim_Timeline import UI, constants, timeLine, objects
 reload(UI)
 reload(constants)
 reload(timeLine)
-reload(materials)
+reload(objects)
 UI.start()
 
 Step Four:

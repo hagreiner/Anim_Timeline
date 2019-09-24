@@ -1,7 +1,5 @@
 WIDTH = 350
 
-SHADER_NAME = "Animated_PBR"
-
 MAX_TIME = 1000
 
 MIN_TIME = 10
