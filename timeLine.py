@@ -4,10 +4,34 @@ from objects import CharacterModel
 
 
 class CreateBuild:
-    cube = None
-
+    hipCenter = None
+    spine = None
+    neckBase = None
+    shoulderBladeLeft = None
+    shoulderLeft = None
+    elbowLeft = None
+    wristLeft = None
+    handLeft = None
+    shoulderBladeRight = None
+    shoulderRight = None
+    elbowRight = None
+    wristRight = None
+    handRight = None
+    hipLeft = None
+    kneeLeft = None
+    ankleLeft = None
+    footLeft = None
+    hipRight = None
+    kneeRight = None
+    ankleRight = None
+    footRight = None
     def buildObjects(self):
-        CreateBuild.cube = CharacterModel().make()
+        CreateBuild.hipCenter, CreateBuild.spine, CreateBuild.neckBase, CreateBuild.shoulderBladeLeft, \
+        CreateBuild.shoulderLeft, CreateBuild.elbowLeft, CreateBuild.wristLeft, CreateBuild.handLeft, \
+        CreateBuild.shoulderBladeRight, CreateBuild.shoulderRight, CreateBuild.elbowRight, \
+        CreateBuild.wristRight, CreateBuild.handRight, CreateBuild.hipLeft, CreateBuild.kneeLeft, \
+        CreateBuild.ankleLeft, CreateBuild.footLeft, CreateBuild.hipRight, CreateBuild.kneeRight, \
+        CreateBuild.ankleRight, CreateBuild.footRight = CharacterModel().make()
 
 
 class Play:
@@ -19,18 +43,18 @@ class Play:
         Play.distX = cmds.intSliderGrp("distanceX", query=True, value=True)
         cmds.playbackOptions( minTime='0sec', maxTime=str(Play.frameNum/30.0) + 'sec')
         try:
-            delFrames(CreateBuild.cube)
+            cmds.cutKey( time=(0,MAX_TIME), cl=True)
         except:
             pass
 
     def forwards(self):
         Play().stop()
-        LoadClipOne(direction="forward", object=CreateBuild.cube).load()
+        LoadClipOne(direction="forward").load()
         cmds.play(forward=True)
 
     def backwards(self):
         Play().stop()
-        LoadClipOne(direction="backwards", object=CreateBuild.cube).load()
+        LoadClipOne(direction="backwards").load()
         cmds.play(forward=True)
 
     def stop(self):
@@ -38,31 +62,28 @@ class Play:
 
 
 class LoadClipOne:
-    def __init__(self, direction, object):
+    def __init__(self, direction):
         if direction == "forward":
             self.direction = 0
         else:
             self.direction = Play.distX
-        if object == CreateBuild.cube:
-            self.object = "objectCube"
 
     def load(self):
-        (ClipDictionary().dicts(self.direction)[self.object]).keys()
+        Clips().PosOne(time=0)
+        Clips().PosTwo(time=2)
+        Clips().PosOne(time=4)
 
 
-class ClipDictionary:
-    def dicts(self, value):
-        clips = {
-            "objectCube": {
-                1: cmds.setKeyframe(CreateBuild.cube, attribute='translateX', t=[calcFrames()[0], calcFrames()[1]], v=abs(value)),
-                2: cmds.setKeyframe(CreateBuild.cube, attribute='translateX', t=[calcFrames()[1], calcFrames()[2]], v=abs(value - (Play.distX / 5.0))),
-                3: cmds.setKeyframe(CreateBuild.cube, attribute='translateX', t=[calcFrames()[2], calcFrames()[3]], v=abs(value - 2*(Play.distX / 5.0))),
-                4: cmds.setKeyframe(CreateBuild.cube, attribute='translateX', t=[calcFrames()[3], calcFrames()[4]], v=abs(value - 3*(Play.distX / 5.0))),
-                5: cmds.setKeyframe(CreateBuild.cube, attribute='translateX', t=[calcFrames()[4], calcFrames()[5]], v=abs(value - 4*(Play.distX / 5.0))),
-                6: cmds.setKeyframe(CreateBuild.cube, attribute='translateX', t=[calcFrames()[5], calcFrames()[6]], v=abs(value - 5*(Play.distX / 5.0))),
-            },
-        }
-        return clips
+class Clips:
+    def PosOne(self, time):
+        cmds.setKeyframe(CreateBuild.shoulderLeft, at="rotateZ", value=90, t=(calcFrames()[time], calcFrames()[time + 1]))
+        cmds.setKeyframe(CreateBuild.shoulderRight, at="rotateZ", value=90, t=(calcFrames()[time], calcFrames()[time + 1]))
+        cmds.setKeyframe(CreateBuild.shoulderLeft, at="rotateY", value=0, t=(calcFrames()[time], calcFrames()[time + 1]))
+        cmds.setKeyframe(CreateBuild.shoulderRight, at="rotateY", value=0, t=(calcFrames()[time], calcFrames()[time + 1]))
+
+    def PosTwo(self, time):
+        cmds.setKeyframe(CreateBuild.shoulderLeft, at="rotateY", value=90, t=(calcFrames()[time], calcFrames()[time + 1]))
+        cmds.setKeyframe(CreateBuild.shoulderRight, at="rotateY", value=90, t=(calcFrames()[time], calcFrames()[time + 1]))
 
 
 def reset():
@@ -70,8 +91,10 @@ def reset():
 
 
 def calcFrames():
+    frameNum = 5
     return [
-        0, Play.frameNum/6, (Play.frameNum/6)*2, (Play.frameNum/6)*3, (Play.frameNum/6)*4, (Play.frameNum/6)*5, (Play.frameNum/6)*6
+        0, Play.frameNum/frameNum, (Play.frameNum/frameNum)*2, (Play.frameNum/frameNum)*3, (Play.frameNum/frameNum)*4,
+        (Play.frameNum/frameNum)*5,
     ]
 
 
