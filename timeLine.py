@@ -73,14 +73,19 @@ class LoadClipOne:
         Clips().PosTwo(time=2)
         Clips().PosThree(time=4)
         Clips().PosFour(time=6)
-        Clips().PosThree(time=8)
-        # Clips().PosTwo(time=10)
-        # Clips().PosOne(time=8)
+        Clips().PosFive(time=8)
+        Clips().PosSix(time=10)
+        Clips().PosFive(time=12)
+        Clips().PosFour(time=14)
+        Clips().PosThree(time=16)
+        Clips().PosTwo(time=18)
+        Clips().PosOne(time=20)
 
 
 class Clips:
     def PosOne(self, time):
         cmds.setKeyframe(CreateBuild.hipCenter, at="rotateY", v=0, t=(calcFrames()[time], calcFrames()[time + 1]))
+        cmds.setKeyframe(CreateBuild.spine, at="rotateY", v=0, t=(calcFrames()[time], calcFrames()[time + 1]))
 
         cmds.setKeyframe(CreateBuild.shoulderLeft, at="rotateZ", v=90, t=(calcFrames()[time], calcFrames()[time + 1]))
         cmds.setKeyframe(CreateBuild.shoulderLeft, at="rotateY", v=0, t=(calcFrames()[time], calcFrames()[time + 1]))
@@ -93,10 +98,12 @@ class Clips:
         cmds.setKeyframe(CreateBuild.shoulderRight, at="rotateZ", v=90, t=(calcFrames()[time], calcFrames()[time + 1]))
 
         cmds.setKeyframe(CreateBuild.hipRight, at="rotateY", v=0, t=(calcFrames()[time], calcFrames()[time + 1]))
-        cmds.setKeyframe(CreateBuild.hipRight, at="translateX", v=0, t=(calcFrames()[time], calcFrames()[time + 1]))
+        cmds.setKeyframe(CreateBuild.hipRight, at="translateX", v=-2.5, t=(calcFrames()[time], calcFrames()[time + 1]))
+        cmds.setKeyframe(CreateBuild.ankleRight, at="rotateZ", value=0, t=(calcFrames()[time], calcFrames()[time + 1]))
 
     def PosTwo(self, time):
         cmds.setKeyframe(CreateBuild.hipCenter, at="rotateY", value=0, t=(calcFrames()[time], calcFrames()[time + 1]))
+        cmds.setKeyframe(CreateBuild.spine, at="rotateY", v=-25, t=(calcFrames()[time], calcFrames()[time + 1]))
 
         cmds.setKeyframe(CreateBuild.shoulderLeft, at="rotateY", value=0,
                          t=(calcFrames()[time], calcFrames()[time + 1]))
@@ -104,30 +111,79 @@ class Clips:
         cmds.setKeyframe(CreateBuild.hipLeft, at="rotateY", value=0, t=(calcFrames()[time], calcFrames()[time + 1]))
         cmds.setKeyframe(CreateBuild.kneeLeft, at="rotateZ", value=0, t=(calcFrames()[time], calcFrames()[time + 1]))
 
+        cmds.setKeyframe(CreateBuild.ankleLeft, at="rotateZ", value=-0, t=(calcFrames()[time], calcFrames()[time + 1]))
+
         cmds.setKeyframe(CreateBuild.shoulderRight, at="rotateY", value=0,
                          t=(calcFrames()[time], calcFrames()[time + 1]))
 
         cmds.setKeyframe(CreateBuild.kneeRight, at="rotateY", value=0, t=(calcFrames()[time], calcFrames()[time + 1]))
         cmds.setKeyframe(CreateBuild.hipRight, at="rotateY", value=14, t=(calcFrames()[time], calcFrames()[time + 1]))
-        cmds.setKeyframe(CreateBuild.ankleRight, at="rotateZ", value=0, t=(calcFrames()[time], calcFrames()[time + 1]))
+        cmds.setKeyframe(CreateBuild.hipRight, at="translateX", v=2.5, t=(calcFrames()[time], calcFrames()[time + 1]))
+        cmds.setKeyframe(CreateBuild.ankleRight, at="rotateZ", value=-14, t=(calcFrames()[time], calcFrames()[time + 1]))
 
     def PosThree(self, time):
+        cmds.setKeyframe(CreateBuild.hipCenter, at="rotateY", value=-20, t=(calcFrames()[time], calcFrames()[time + 1]))
+        cmds.setKeyframe(CreateBuild.spine, at="rotateY", v=0, t=(calcFrames()[time], calcFrames()[time + 1]))
+
+        cmds.setKeyframe(CreateBuild.shoulderLeft, at="rotateY", value=-30, t=(calcFrames()[time], calcFrames()[time + 1]))
+
+        cmds.setKeyframe(CreateBuild.hipLeft, at="rotateY", value=47, t=(calcFrames()[time], calcFrames()[time + 1]))
+        cmds.setKeyframe(CreateBuild.kneeLeft, at="rotateZ", value=-65, t=(calcFrames()[time], calcFrames()[time + 1]))
+
+        cmds.setKeyframe(CreateBuild.shoulderRight, at="rotateY", value=30, t=(calcFrames()[time], calcFrames()[time + 1]))
+
+        cmds.setKeyframe(CreateBuild.hipRight, at="rotateY", value=-7, t=(calcFrames()[time], calcFrames()[time + 1]))
+
+        cmds.setKeyframe(CreateBuild.hipRight, at="translateX", v=-2.5, t=(calcFrames()[time], calcFrames()[time + 1]))
+        cmds.setKeyframe(CreateBuild.kneeRight, at="rotateY", value=0, t=(calcFrames()[time], calcFrames()[time + 1]))
+
+        cmds.setKeyframe(CreateBuild.ankleRight, at="rotateZ", value=5, t=(calcFrames()[time], calcFrames()[time + 1]))
+
+    def PosFour(self, time):
+        cmds.setKeyframe(CreateBuild.hipCenter, at="rotateY", value=-20, t=(calcFrames()[time], calcFrames()[time + 1]))
+
+        cmds.setKeyframe(CreateBuild.shoulderLeft, at="rotateY", value=-30, t=(calcFrames()[time], calcFrames()[time + 1]))
+
+        cmds.setKeyframe(CreateBuild.hipLeft, at="rotateY", value=47, t=(calcFrames()[time], calcFrames()[time + 1]))
+        cmds.setKeyframe(CreateBuild.kneeLeft, at="rotateZ", value=-65, t=(calcFrames()[time], calcFrames()[time + 1]))
+
+        cmds.setKeyframe(CreateBuild.ankleLeft, at="rotateZ", value=0, t=(calcFrames()[time], calcFrames()[time + 1]))
+
+        cmds.setKeyframe(CreateBuild.shoulderRight, at="rotateY", value=30, t=(calcFrames()[time], calcFrames()[time + 1]))
+
+        cmds.setKeyframe(CreateBuild.hipRight, at="rotateY", value=-7, t=(calcFrames()[time], calcFrames()[time + 1]))
+
+        cmds.setKeyframe(CreateBuild.hipRight, at="translateX", v=-2.5, t=(calcFrames()[time], calcFrames()[time + 1]))
+        cmds.setKeyframe(CreateBuild.kneeRight, at="rotateY", value=20, t=(calcFrames()[time], calcFrames()[time + 1]))
+
+        cmds.setKeyframe(CreateBuild.ankleRight, at="rotateZ", value=5, t=(calcFrames()[time], calcFrames()[time + 1]))
+
+    def PosFive(self, time):
         cmds.setKeyframe(CreateBuild.hipCenter, at="rotateY", value=-40, t=(calcFrames()[time], calcFrames()[time + 1]))
 
-        cmds.setKeyframe(CreateBuild.shoulderLeft, at="rotateY", value=-60, t=(calcFrames()[time], calcFrames()[time + 1]))
+        cmds.setKeyframe(CreateBuild.shoulderLeft, at="rotateY", value=-60,
+                         t=(calcFrames()[time], calcFrames()[time + 1]))
 
         cmds.setKeyframe(CreateBuild.hipLeft, at="rotateY", value=90, t=(calcFrames()[time], calcFrames()[time + 1]))
         cmds.setKeyframe(CreateBuild.kneeLeft, at="rotateZ", value=-120, t=(calcFrames()[time], calcFrames()[time + 1]))
 
-        cmds.setKeyframe(CreateBuild.shoulderRight, at="rotateY", value=60, t=(calcFrames()[time], calcFrames()[time + 1]))
+        cmds.setKeyframe(CreateBuild.ankleLeft, at="rotateZ", value=0, t=(calcFrames()[time], calcFrames()[time + 1]))
+
+        cmds.setKeyframe(CreateBuild.shoulderRight, at="rotateY", value=50,
+                         t=(calcFrames()[time], calcFrames()[time + 1]))
 
         cmds.setKeyframe(CreateBuild.hipRight, at="rotateY", value=-7, t=(calcFrames()[time], calcFrames()[time + 1]))
-        cmds.setKeyframe(CreateBuild.kneeRight, at="rotateY", value=0, t=(calcFrames()[time], calcFrames()[time + 1]))
-        cmds.setKeyframe(CreateBuild.ankleRight, at="rotateZ", value=-14, t=(calcFrames()[time], calcFrames()[time + 1]))
 
-    def PosFour(self, time):
+        cmds.setKeyframe(CreateBuild.kneeRight, at="rotateY", value=0, t=(calcFrames()[time], calcFrames()[time + 1]))
+
+        cmds.setKeyframe(CreateBuild.ankleRight, at="rotateZ", value=-14,
+                         t=(calcFrames()[time], calcFrames()[time + 1]))
+
+    def PosSix(self, time):
         cmds.setKeyframe(CreateBuild.hipLeft, at="rotateY", value=14, t=(calcFrames()[time], calcFrames()[time + 1]))
         cmds.setKeyframe(CreateBuild.kneeLeft, at="rotateZ", value=-0, t=(calcFrames()[time], calcFrames()[time + 1]))
+
+        cmds.setKeyframe(CreateBuild.ankleLeft, at="rotateZ", value=-14, t=(calcFrames()[time], calcFrames()[time + 1]))
 
         cmds.setKeyframe(CreateBuild.hipRight, at="rotateY", value=-90, t=(calcFrames()[time], calcFrames()[time + 1]))
         cmds.setKeyframe(CreateBuild.kneeRight, at="rotateY", value=120, t=(calcFrames()[time], calcFrames()[time + 1]))
@@ -139,12 +195,11 @@ def reset():
 
 
 def calcFrames():
-    frameNum = 9
-    return [
-        0, Play.frameNum/frameNum, (Play.frameNum/frameNum)*2, (Play.frameNum/frameNum)*3, (Play.frameNum/frameNum)*4,
-        (Play.frameNum/frameNum)*5, (Play.frameNum/frameNum)*6, (Play.frameNum/frameNum)*7, (Play.frameNum/frameNum)*8,
-        (Play.frameNum / frameNum) * 9,
-    ]
+    frameCount = 22
+    returnList = []
+    for x in range(frameCount):
+        returnList.append((Play.frameNum/frameCount)*x)
+    return returnList
 
 
 def delFrames(object):
