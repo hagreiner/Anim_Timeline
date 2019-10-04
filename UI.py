@@ -47,9 +47,6 @@ class MainUI:
         cmds.intSliderGrp("frameNum", label="Number of Frames", field=True,
                           minValue=MIN_TIME, maxValue=MAX_TIME, value=MIN_TIME,
                           columnWidth=[(1, 100), (2, 50), (3, WIDTH-125)],  cal=[1, "center"])
-        cmds.intSliderGrp("distanceX", label="X movement", field=True,
-                          minValue=MIN_X_DIST, maxValue=MAX_X_DIST, value=MIN_X_DIST,
-                          columnWidth=[(1, 100), (2, 50), (3, WIDTH-125)],  cal=[1, "center"])
 
         cmds.rowColumnLayout(numberOfColumns=1, columnWidth=[(1, self.width)], parent=self.column)
         cmds.button(label="PLAY", command=lambda args: Play().forwards())
