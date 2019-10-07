@@ -1,9 +1,13 @@
 import maya.cmds as cmds
 from constants import MAX_TIME
 from objects import CharacterModel
+import math
 
 
 class CreateBuild:
+    """
+    "joint":joint, "parent":parent, "rotateX":0, "rotateY":0, "rotateZ":0, "posX":xpos, "posY":ypos, "posZ":zpos
+    """
     hipCenter = None
     spine = None
     neckBase = None
@@ -25,6 +29,7 @@ class CreateBuild:
     kneeRight = None
     ankleRight = None
     footRight = None
+    skeletonDict = {}
 
     def buildObjects(self):
         CreateBuild.hipCenter, CreateBuild.spine, CreateBuild.neckBase, CreateBuild.shoulderBladeLeft, \
@@ -34,6 +39,74 @@ class CreateBuild:
         CreateBuild.ankleLeft, CreateBuild.footLeft, CreateBuild.hipRight, CreateBuild.kneeRight, \
         CreateBuild.ankleRight, CreateBuild.footRight = CharacterModel().make()
 
+        CreateBuild.skeletonDict = {"hipCenter": CreateBuild.hipCenter, "spine":CreateBuild.spine,
+                                    "neck":CreateBuild.neckBase, "leftShoulderBlade":CreateBuild.shoulderBladeLeft,
+                                    "rightShoulderBlade":CreateBuild.shoulderBladeRight,
+                                    "leftShoulder":CreateBuild.shoulderLeft, "rightShoulder":CreateBuild.shoulderRight,
+                                    "leftElbow":CreateBuild.elbowLeft, "rightElbow":CreateBuild.elbowRight,
+                                    "leftWrist":CreateBuild.wristLeft, "leftHand":CreateBuild.handLeft,
+                                    "rightWrist":CreateBuild.wristRight, "rightHand":CreateBuild.handRight,
+                                    "leftHip":CreateBuild.hipLeft, "leftKnee":CreateBuild.kneeLeft,
+                                    "leftAnkle":CreateBuild.ankleLeft, "leftFoot":CreateBuild.footLeft,
+                                    "rightHip":CreateBuild.hipRight, "rightKnee":CreateBuild.kneeRight,
+                                    "rightAnkle":CreateBuild.ankleRight, "rightFoot":CreateBuild.footRight}
+
+
+class Controls:
+    def findChildren(self, joint):
+        checkList = [CreateBuild.skeletonDict[joint]["joint"]]
+        childList = []
+
+        for x in range(len(CreateBuild.skeletonDict)):
+            for k, v in CreateBuild.skeletonDict.items():
+                if v["parent"] in checkList and v["joint"] not in checkList:
+                    checkList.append(v["joint"])
+                    childList.append(v)
+
+        print(checkList)
+        print(childList)
+        return childList
+
+
+class RotatePos:
+    def __init__(self, parent, degree):
+        self.childList = Controls().findChildren(joint=parent)
+        self.parent = CreateBuild.skeletonDict[parent]
+        self.rotationDegree = degree
+
+    def rotY(self):
+        cmds.rotate(0, str(self.rotationDegree) + "deg", 0, self.parent["joint"])
+        print(self.parent["posX"], self.parent["posY"], self.parent["posZ"])
+        for joint in self.childList:
+            angleSin = math.sin(self.rotationDegree)
+            angleCos = math.cos(self.rotationDegree)
+
+            joint["posX"] -= self.parent["posX"]
+            joint["posZ"] -= self.parent["posZ"]
+
+            tempX = joint["posX"]
+            tempZ = joint["posZ"]
+
+            joint["posX"] = tempX * angleCos - tempZ * angleSin
+            joint["posZ"] = tempX * angleSin + tempZ * angleCos
+
+            x_move = joint["posX"] + self.parent["posX"]
+            z_move = joint["posZ"] + self.parent["posZ"]
+
+            cmds.move(x_move, 0, z_move, joint["joint"], relative=True)
+
+            cmds.rotate(0, self.rotationDegree, 0, joint["joint"])
+
+            joint["posX"] = x_move
+            joint["posZ"] = z_move
+            joint["rotateY"] = self.rotationDegree
+
+    def rotX(self):
+        pass
+
+    def rotZ(self):
+        pass
+
 
 class Play:
     frameNum = 10
@@ -41,16 +114,16 @@ class Play:
 
     def __init__(self):
         Play.frameNum = cmds.intSliderGrp("frameNum", query=True, value=True)
-        Play.distX = cmds.intSliderGrp("distanceX", query=True, value=True)
         cmds.playbackOptions(minTime='0sec', maxTime=str(Play.frameNum/30.0) + 'sec')
         cmds.select(all=True)
         cmds.cutKey(time=(0,MAX_TIME), cl=True)
         cmds.select(clear=True)
 
     def forwards(self):
-        Play().stop()
-        LoadClipOne(direction="forward").load()
-        cmds.play(forward=True)
+        RotatePos(parent="leftShoulder", degree=30.0).rotY()
+        # Play().stop()
+        # LoadClipOne(direction="forward").load()
+        # cmds.play(forward=True)
 
     def backwards(self):
         Play().stop()
@@ -69,125 +142,12 @@ class LoadClipOne:
             self.direction = Play.distX
 
     def load(self):
-        Clips().PosOne(time=0)
-        Clips().PosTwo(time=2)
-        Clips().PosThree(time=4)
-        Clips().PosFour(time=6)
-        Clips().PosFive(time=8)
-        Clips().PosSix(time=10)
-        Clips().PosFive(time=12)
-        Clips().PosFour(time=14)
-        Clips().PosThree(time=16)
-        Clips().PosTwo(time=18)
-        Clips().PosOne(time=20)
+        pass
 
 
 class Clips:
     def PosOne(self, time):
-        cmds.setKeyframe(CreateBuild.hipCenter, at="rotateY", v=0, t=(calcFrames()[time], calcFrames()[time + 1]))
-        cmds.setKeyframe(CreateBuild.spine, at="rotateY", v=0, t=(calcFrames()[time], calcFrames()[time + 1]))
-
-        cmds.setKeyframe(CreateBuild.shoulderLeft, at="rotateZ", v=90, t=(calcFrames()[time], calcFrames()[time + 1]))
-        cmds.setKeyframe(CreateBuild.shoulderLeft, at="rotateY", v=0, t=(calcFrames()[time], calcFrames()[time + 1]))
-
-        cmds.setKeyframe(CreateBuild.hipLeft, at="rotateY", v=0, t=(calcFrames()[time], calcFrames()[time + 1]))
-
-        cmds.setKeyframe(CreateBuild.kneeLeft, at="rotateZ", v=0, t=(calcFrames()[time], calcFrames()[time + 1]))
-
-        cmds.setKeyframe(CreateBuild.shoulderRight, at="rotateY", v=0, t=(calcFrames()[time], calcFrames()[time + 1]))
-        cmds.setKeyframe(CreateBuild.shoulderRight, at="rotateZ", v=90, t=(calcFrames()[time], calcFrames()[time + 1]))
-
-        cmds.setKeyframe(CreateBuild.hipRight, at="rotateY", v=0, t=(calcFrames()[time], calcFrames()[time + 1]))
-        cmds.setKeyframe(CreateBuild.hipRight, at="translateX", v=-2.5, t=(calcFrames()[time], calcFrames()[time + 1]))
-        cmds.setKeyframe(CreateBuild.ankleRight, at="rotateZ", value=0, t=(calcFrames()[time], calcFrames()[time + 1]))
-
-    def PosTwo(self, time):
-        cmds.setKeyframe(CreateBuild.hipCenter, at="rotateY", value=0, t=(calcFrames()[time], calcFrames()[time + 1]))
-        cmds.setKeyframe(CreateBuild.spine, at="rotateY", v=-25, t=(calcFrames()[time], calcFrames()[time + 1]))
-
-        cmds.setKeyframe(CreateBuild.shoulderLeft, at="rotateY", value=0,
-                         t=(calcFrames()[time], calcFrames()[time + 1]))
-
-        cmds.setKeyframe(CreateBuild.hipLeft, at="rotateY", value=0, t=(calcFrames()[time], calcFrames()[time + 1]))
-        cmds.setKeyframe(CreateBuild.kneeLeft, at="rotateZ", value=0, t=(calcFrames()[time], calcFrames()[time + 1]))
-
-        cmds.setKeyframe(CreateBuild.ankleLeft, at="rotateZ", value=-0, t=(calcFrames()[time], calcFrames()[time + 1]))
-
-        cmds.setKeyframe(CreateBuild.shoulderRight, at="rotateY", value=0,
-                         t=(calcFrames()[time], calcFrames()[time + 1]))
-
-        cmds.setKeyframe(CreateBuild.kneeRight, at="rotateY", value=0, t=(calcFrames()[time], calcFrames()[time + 1]))
-        cmds.setKeyframe(CreateBuild.hipRight, at="rotateY", value=14, t=(calcFrames()[time], calcFrames()[time + 1]))
-        cmds.setKeyframe(CreateBuild.hipRight, at="translateX", v=2.5, t=(calcFrames()[time], calcFrames()[time + 1]))
-        cmds.setKeyframe(CreateBuild.ankleRight, at="rotateZ", value=-14, t=(calcFrames()[time], calcFrames()[time + 1]))
-
-    def PosThree(self, time):
-        cmds.setKeyframe(CreateBuild.hipCenter, at="rotateY", value=-20, t=(calcFrames()[time], calcFrames()[time + 1]))
-        cmds.setKeyframe(CreateBuild.spine, at="rotateY", v=0, t=(calcFrames()[time], calcFrames()[time + 1]))
-
-        cmds.setKeyframe(CreateBuild.shoulderLeft, at="rotateY", value=-30, t=(calcFrames()[time], calcFrames()[time + 1]))
-
-        cmds.setKeyframe(CreateBuild.hipLeft, at="rotateY", value=47, t=(calcFrames()[time], calcFrames()[time + 1]))
-        cmds.setKeyframe(CreateBuild.kneeLeft, at="rotateZ", value=-65, t=(calcFrames()[time], calcFrames()[time + 1]))
-
-        cmds.setKeyframe(CreateBuild.shoulderRight, at="rotateY", value=30, t=(calcFrames()[time], calcFrames()[time + 1]))
-
-        cmds.setKeyframe(CreateBuild.hipRight, at="rotateY", value=-7, t=(calcFrames()[time], calcFrames()[time + 1]))
-
-        cmds.setKeyframe(CreateBuild.hipRight, at="translateX", v=-2.5, t=(calcFrames()[time], calcFrames()[time + 1]))
-        cmds.setKeyframe(CreateBuild.kneeRight, at="rotateY", value=0, t=(calcFrames()[time], calcFrames()[time + 1]))
-
-        cmds.setKeyframe(CreateBuild.ankleRight, at="rotateZ", value=5, t=(calcFrames()[time], calcFrames()[time + 1]))
-
-    def PosFour(self, time):
-        cmds.setKeyframe(CreateBuild.hipCenter, at="rotateY", value=-20, t=(calcFrames()[time], calcFrames()[time + 1]))
-
-        cmds.setKeyframe(CreateBuild.shoulderLeft, at="rotateY", value=-30, t=(calcFrames()[time], calcFrames()[time + 1]))
-
-        cmds.setKeyframe(CreateBuild.hipLeft, at="rotateY", value=47, t=(calcFrames()[time], calcFrames()[time + 1]))
-        cmds.setKeyframe(CreateBuild.kneeLeft, at="rotateZ", value=-65, t=(calcFrames()[time], calcFrames()[time + 1]))
-
-        cmds.setKeyframe(CreateBuild.ankleLeft, at="rotateZ", value=0, t=(calcFrames()[time], calcFrames()[time + 1]))
-
-        cmds.setKeyframe(CreateBuild.shoulderRight, at="rotateY", value=30, t=(calcFrames()[time], calcFrames()[time + 1]))
-
-        cmds.setKeyframe(CreateBuild.hipRight, at="rotateY", value=-7, t=(calcFrames()[time], calcFrames()[time + 1]))
-
-        cmds.setKeyframe(CreateBuild.hipRight, at="translateX", v=-2.5, t=(calcFrames()[time], calcFrames()[time + 1]))
-        cmds.setKeyframe(CreateBuild.kneeRight, at="rotateY", value=20, t=(calcFrames()[time], calcFrames()[time + 1]))
-
-        cmds.setKeyframe(CreateBuild.ankleRight, at="rotateZ", value=5, t=(calcFrames()[time], calcFrames()[time + 1]))
-
-    def PosFive(self, time):
-        cmds.setKeyframe(CreateBuild.hipCenter, at="rotateY", value=-40, t=(calcFrames()[time], calcFrames()[time + 1]))
-
-        cmds.setKeyframe(CreateBuild.shoulderLeft, at="rotateY", value=-60,
-                         t=(calcFrames()[time], calcFrames()[time + 1]))
-
-        cmds.setKeyframe(CreateBuild.hipLeft, at="rotateY", value=90, t=(calcFrames()[time], calcFrames()[time + 1]))
-        cmds.setKeyframe(CreateBuild.kneeLeft, at="rotateZ", value=-120, t=(calcFrames()[time], calcFrames()[time + 1]))
-
-        cmds.setKeyframe(CreateBuild.ankleLeft, at="rotateZ", value=0, t=(calcFrames()[time], calcFrames()[time + 1]))
-
-        cmds.setKeyframe(CreateBuild.shoulderRight, at="rotateY", value=50,
-                         t=(calcFrames()[time], calcFrames()[time + 1]))
-
-        cmds.setKeyframe(CreateBuild.hipRight, at="rotateY", value=-7, t=(calcFrames()[time], calcFrames()[time + 1]))
-
-        cmds.setKeyframe(CreateBuild.kneeRight, at="rotateY", value=0, t=(calcFrames()[time], calcFrames()[time + 1]))
-
-        cmds.setKeyframe(CreateBuild.ankleRight, at="rotateZ", value=-14,
-                         t=(calcFrames()[time], calcFrames()[time + 1]))
-
-    def PosSix(self, time):
-        cmds.setKeyframe(CreateBuild.hipLeft, at="rotateY", value=14, t=(calcFrames()[time], calcFrames()[time + 1]))
-        cmds.setKeyframe(CreateBuild.kneeLeft, at="rotateZ", value=-0, t=(calcFrames()[time], calcFrames()[time + 1]))
-
-        cmds.setKeyframe(CreateBuild.ankleLeft, at="rotateZ", value=-14, t=(calcFrames()[time], calcFrames()[time + 1]))
-
-        cmds.setKeyframe(CreateBuild.hipRight, at="rotateY", value=-90, t=(calcFrames()[time], calcFrames()[time + 1]))
-        cmds.setKeyframe(CreateBuild.kneeRight, at="rotateY", value=120, t=(calcFrames()[time], calcFrames()[time + 1]))
-        cmds.setKeyframe(CreateBuild.ankleRight, at="rotateZ", value=0, t=(calcFrames()[time], calcFrames()[time + 1]))
+        pass
 
 
 def reset():
