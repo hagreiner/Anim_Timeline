@@ -63,8 +63,6 @@ class Controls:
                     checkList.append(v["joint"])
                     childList.append(v)
 
-        print(checkList)
-        print(childList)
         return childList
 
 
@@ -76,7 +74,7 @@ class RotatePos:
 
     def rotY(self):
         cmds.rotate(0, str(self.rotationDegree) + "deg", 0, self.parent["joint"])
-        print(self.parent["posX"], self.parent["posY"], self.parent["posZ"])
+        self.parent["rotateY"] = self.rotationDegree
         for joint in self.childList:
             angleSin = math.sin(self.rotationDegree)
             angleCos = math.cos(self.rotationDegree)
@@ -87,25 +85,67 @@ class RotatePos:
             tempX = joint["posX"]
             tempZ = joint["posZ"]
 
-            joint["posX"] = tempX * angleCos - tempZ * angleSin
-            joint["posZ"] = tempX * angleSin + tempZ * angleCos
+            joint["posX"] = tempX * angleCos + tempZ * angleSin
+            joint["posZ"] = -1 * tempX * angleSin + tempZ * angleCos
 
             x_move = joint["posX"] + self.parent["posX"]
             z_move = joint["posZ"] + self.parent["posZ"]
 
-            cmds.move(x_move, 0, z_move, joint["joint"], relative=True)
-
-            cmds.rotate(0, self.rotationDegree, 0, joint["joint"])
+            cmds.move(x_move, joint["posY"], z_move, joint["joint"])
 
             joint["posX"] = x_move
             joint["posZ"] = z_move
-            joint["rotateY"] = self.rotationDegree
+        return self.childList
 
     def rotX(self):
-        pass
+        cmds.rotate(str(self.rotationDegree) + "deg", 0, 0, self.parent["joint"])
+        self.parent["rotateX"] = self.rotationDegree
+        for joint in self.childList:
+            angleSin = math.sin(self.rotationDegree)
+            angleCos = math.cos(self.rotationDegree)
+
+            joint["posY"] -= self.parent["posY"]
+            joint["posZ"] -= self.parent["posZ"]
+
+            tempY = joint["posY"]
+            tempZ = joint["posZ"]
+
+            joint["posY"] = tempY * angleCos + tempZ * angleSin
+            joint["posZ"] = -1 * tempY * angleSin + tempZ * angleCos
+
+            y_move = joint["posY"] + self.parent["posY"]
+            z_move = joint["posZ"] + self.parent["posZ"]
+
+            cmds.move(joint["posX"], y_move, z_move, joint["joint"])
+
+            joint["posY"] = y_move
+            joint["posZ"] = z_move
+        return self.childList
 
     def rotZ(self):
-        pass
+        cmds.rotate(0, 0, str(self.rotationDegree) + "deg",  self.parent["joint"])
+        self.parent["rotateZ"] = self.rotationDegree
+        for joint in self.childList:
+            angleSin = math.sin(self.rotationDegree)
+            angleCos = math.cos(self.rotationDegree)
+
+            joint["posX"] -= self.parent["posX"]
+            joint["posY"] -= self.parent["posY"]
+
+            tempX = joint["posX"]
+            tempY = joint["posY"]
+
+            joint["posX"] = tempX * angleCos + tempY * angleSin
+            joint["posY"] = -1 * tempX * angleSin + tempY * angleCos
+
+            x_move = joint["posX"] + self.parent["posX"]
+            y_move = joint["posY"] + self.parent["posY"]
+
+            cmds.move(x_move, y_move, joint["posZ"], joint["joint"])
+
+            joint["posX"] = x_move
+            joint["posY"] = y_move
+        return self.childList
 
 
 class Play:
@@ -120,10 +160,9 @@ class Play:
         cmds.select(clear=True)
 
     def forwards(self):
-        RotatePos(parent="leftShoulder", degree=30.0).rotY()
-        # Play().stop()
-        # LoadClipOne(direction="forward").load()
-        # cmds.play(forward=True)
+        Play().stop()
+        LoadClipOne(direction="forward").load()
+        cmds.play(forward=True)
 
     def backwards(self):
         Play().stop()
@@ -142,12 +181,23 @@ class LoadClipOne:
             self.direction = Play.distX
 
     def load(self):
-        pass
+        Clips().PosOne(time=0)
+        Clips().PosTwo(time=2)
 
 
 class Clips:
     def PosOne(self, time):
-        pass
+        keyedList_1 = RotatePos(parent="leftShoulder", degree=30.0).rotY()
+        for items in keyedList_1:
+            # cmds.keyframe('surface1.translateX',edit=True,index=(1,1),timeChange='1.5sec',valueChange=10.25)
+            cmds.setKeyframe(items["joint"] + '.tx', edit=True, time=(calcFrames()[time], calcFrames()[time+1]))
+            cmds.setKeyframe(items["joint"] + '.tz', edit=True, time=(calcFrames()[time], calcFrames()[time+1]))
+    def PosTwo(self, time):
+        keyedList_1 = RotatePos(parent="leftShoulder", degree=-30.0).rotY()
+        for items in keyedList_1:
+            # cmds.keyframe('surface1.translateX',edit=True,index=(1,1),timeChange='1.5sec',valueChange=10.25)
+            cmds.setKeyframe(items["joint"] + '.tx', edit=True, time=(calcFrames()[time], calcFrames()[time+1]))
+            cmds.setKeyframe(items["joint"] + '.tz', edit=True, time=(calcFrames()[time], calcFrames()[time+1]))
 
 
 def reset():
@@ -155,7 +205,7 @@ def reset():
 
 
 def calcFrames():
-    frameCount = 22
+    frameCount = 5
     returnList = []
     for x in range(frameCount):
         returnList.append((Play.frameNum/frameCount)*x)

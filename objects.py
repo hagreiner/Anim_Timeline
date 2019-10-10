@@ -1,4 +1,6 @@
 import maya.cmds as cmds
+import maya.OpenMaya as om
+
 
 class CharacterModel:
     def __init__(self):
