@@ -50,6 +50,10 @@ class CreateBuild:
                                     "leftAnkle":CreateBuild.ankleLeft, "leftFoot":CreateBuild.footLeft,
                                     "rightHip":CreateBuild.hipRight, "rightKnee":CreateBuild.kneeRight,
                                     "rightAnkle":CreateBuild.ankleRight, "rightFoot":CreateBuild.footRight}
+        StashPosition.stash = CreateBuild.skeletonDict
+        for jointName, joint in CreateBuild.skeletonDict.items():
+            StashPosition.basePosDict[joint["joint"]] = {"posX": joint["posX"], "posY": joint["posY"], "posZ": joint["posZ"]}
+        StashPosition(jointList=RotatePos(parent="leftShoulder", degree=-30.0).rotY(), poseName="posOne").relativeToBasePos()
 
 
 class Controls:
@@ -181,23 +185,54 @@ class LoadClipOne:
             self.direction = Play.distX
 
     def load(self):
-        Clips().PosOne(time=0)
-        Clips().PosTwo(time=2)
+        Clips().PosInit(time=0)
+        Clips().PosOne(time=1)
+        Clips().PosTwo(time=3)
 
 
 class Clips:
+    def PosInit(self, time):
+        for jointName, joint in CreateBuild.skeletonDict.items():
+            cmds.setKeyframe(joint["joint"] + '.tx', edit=True, time=(calcFrames()[time], calcFrames()[time]))
+            cmds.setKeyframe(joint["joint"] + '.ty', edit=True, time=(calcFrames()[time], calcFrames()[time]))
+            cmds.setKeyframe(joint["joint"] + '.tz', edit=True, time=(calcFrames()[time], calcFrames()[time]))
+
     def PosOne(self, time):
         keyedList_1 = RotatePos(parent="leftShoulder", degree=30.0).rotY()
         for items in keyedList_1:
-            # cmds.keyframe('surface1.translateX',edit=True,index=(1,1),timeChange='1.5sec',valueChange=10.25)
             cmds.setKeyframe(items["joint"] + '.tx', edit=True, time=(calcFrames()[time], calcFrames()[time+1]))
+            cmds.setKeyframe(items["joint"] + '.ty', edit=True, time=(calcFrames()[time], calcFrames()[time+1]))
             cmds.setKeyframe(items["joint"] + '.tz', edit=True, time=(calcFrames()[time], calcFrames()[time+1]))
     def PosTwo(self, time):
         keyedList_1 = RotatePos(parent="leftShoulder", degree=-30.0).rotY()
         for items in keyedList_1:
-            # cmds.keyframe('surface1.translateX',edit=True,index=(1,1),timeChange='1.5sec',valueChange=10.25)
             cmds.setKeyframe(items["joint"] + '.tx', edit=True, time=(calcFrames()[time], calcFrames()[time+1]))
+            cmds.setKeyframe(items["joint"] + '.ty', edit=True, time=(calcFrames()[time], calcFrames()[time+1]))
             cmds.setKeyframe(items["joint"] + '.tz', edit=True, time=(calcFrames()[time], calcFrames()[time+1]))
+        keyedList_2 = RotatePos(parent="leftShoulder", degree=-30.0).rotZ()
+        for items in keyedList_2:
+            cmds.setKeyframe(items["joint"] + '.tx', edit=True, time=(calcFrames()[time], calcFrames()[time+1]))
+            cmds.setKeyframe(items["joint"] + '.ty', edit=True, time=(calcFrames()[time], calcFrames()[time+1]))
+            cmds.setKeyframe(items["joint"] + '.tz', edit=True, time=(calcFrames()[time], calcFrames()[time+1]))
+
+
+class StashPosition:
+    basePosDict = {}
+    posesDict = {}
+    stash = {}
+
+    def __init__(self, jointList, poseName):
+        self.jointList = jointList
+        self.poseName = poseName
+        poseDict = {"new": {}, "base": StashPosition.basePosDict}
+        StashPosition.posesDict[self.poseName] = poseDict
+
+    def relativeToBasePos(self):
+        for x in self.jointList:
+            StashPosition.posesDict[self.poseName]["new"][x["joint"]] \
+                = {"posX": x["posX"], "posY": x["posY"], "posZ": x["posZ"]}
+
+        print(StashPosition.posesDict)
 
 
 def reset():
@@ -205,7 +240,7 @@ def reset():
 
 
 def calcFrames():
-    frameCount = 5
+    frameCount = 6
     returnList = []
     for x in range(frameCount):
         returnList.append((Play.frameNum/frameCount)*x)
