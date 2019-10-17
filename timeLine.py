@@ -33,6 +33,8 @@ class CreateBuild:
         StashPosition(jointList=RotatePos(parent="leftShoulder", degree=-30.0).rotY(), poseName="posOne").relativeToBasePos()
         StashPosition(jointList=RotatePos(parent="leftShoulder", degree=0).rotY(), poseName="posTwo").relativeToBasePos()
         StashPosition(jointList=RotatePos(parent="leftShoulder", degree=-30.0).rotY(), poseName="posThree").relativeToBasePos()
+        StashPosition(jointList=RotatePos(parent="rightKnee", degree=30.0).rotX(), poseName="posKneeOne").relativeToBasePos()
+        StashPosition(jointList=RotatePos(parent="rightKnee", degree=0).rotX(), poseName="posKneeTwo").relativeToBasePos()
 
 
 class Controls:
@@ -160,6 +162,7 @@ class LoadClipOne:
     def load(self):
         Clips().PosInit(time=0)
         Clips().Poses(time=1, loadingList=["base", "posOne", "posTwo", "posThree"])
+        Clips().Poses(time=1, loadingList=["base", "posKneeOne", "posKneeTwo", "posKneeOne"])
 
 
 class Clips:
