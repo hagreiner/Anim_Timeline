@@ -2,58 +2,37 @@ import maya.cmds as cmds
 from constants import MAX_TIME
 from objects import CharacterModel
 import math
+import copy
 
 
 class CreateBuild:
     """
     "joint":joint, "parent":parent, "rotateX":0, "rotateY":0, "rotateZ":0, "posX":xpos, "posY":ypos, "posZ":zpos
     """
-    hipCenter = None
-    spine = None
-    neckBase = None
-    shoulderBladeLeft = None
-    shoulderLeft = None
-    elbowLeft = None
-    wristLeft = None
-    handLeft = None
-    shoulderBladeRight = None
-    shoulderRight = None
-    elbowRight = None
-    wristRight = None
-    handRight = None
-    hipLeft = None
-    kneeLeft = None
-    ankleLeft = None
-    footLeft = None
-    hipRight = None
-    kneeRight = None
-    ankleRight = None
-    footRight = None
     skeletonDict = {}
 
     def buildObjects(self):
-        CreateBuild.hipCenter, CreateBuild.spine, CreateBuild.neckBase, CreateBuild.shoulderBladeLeft, \
-        CreateBuild.shoulderLeft, CreateBuild.elbowLeft, CreateBuild.wristLeft, CreateBuild.handLeft, \
-        CreateBuild.shoulderBladeRight, CreateBuild.shoulderRight, CreateBuild.elbowRight, \
-        CreateBuild.wristRight, CreateBuild.handRight, CreateBuild.hipLeft, CreateBuild.kneeLeft, \
-        CreateBuild.ankleLeft, CreateBuild.footLeft, CreateBuild.hipRight, CreateBuild.kneeRight, \
-        CreateBuild.ankleRight, CreateBuild.footRight = CharacterModel().make()
+        hipCenter, spine, neckBase, shoulderBladeLeft, shoulderLeft, elbowLeft, wristLeft, handLeft, \
+        shoulderBladeRight, shoulderRight, elbowRight, wristRight, handRight, hipLeft, kneeLeft, \
+        ankleLeft, footLeft, hipRight, kneeRight, ankleRight, footRight = CharacterModel().make()
 
-        CreateBuild.skeletonDict = {"hipCenter": CreateBuild.hipCenter, "spine":CreateBuild.spine,
-                                    "neck":CreateBuild.neckBase, "leftShoulderBlade":CreateBuild.shoulderBladeLeft,
-                                    "rightShoulderBlade":CreateBuild.shoulderBladeRight,
-                                    "leftShoulder":CreateBuild.shoulderLeft, "rightShoulder":CreateBuild.shoulderRight,
-                                    "leftElbow":CreateBuild.elbowLeft, "rightElbow":CreateBuild.elbowRight,
-                                    "leftWrist":CreateBuild.wristLeft, "leftHand":CreateBuild.handLeft,
-                                    "rightWrist":CreateBuild.wristRight, "rightHand":CreateBuild.handRight,
-                                    "leftHip":CreateBuild.hipLeft, "leftKnee":CreateBuild.kneeLeft,
-                                    "leftAnkle":CreateBuild.ankleLeft, "leftFoot":CreateBuild.footLeft,
-                                    "rightHip":CreateBuild.hipRight, "rightKnee":CreateBuild.kneeRight,
-                                    "rightAnkle":CreateBuild.ankleRight, "rightFoot":CreateBuild.footRight}
-        StashPosition.stash = CreateBuild.skeletonDict
+        initialDict = {"hipCenter": hipCenter, "spine": spine, "neck": neckBase, "leftShoulderBlade": shoulderBladeLeft,
+                       "rightShoulderBlade": shoulderBladeRight, "leftShoulder": shoulderLeft,
+                       "rightShoulder": shoulderRight, "leftElbow": elbowLeft, "rightElbow": elbowRight,
+                       "leftWrist": wristLeft, "leftHand": handLeft, "rightWrist": wristRight, "rightHand": handRight,
+                       "leftHip": hipLeft, "leftKnee": kneeLeft, "leftAnkle": ankleLeft, "leftFoot": footLeft,
+                       "rightHip": hipRight, "rightKnee": kneeRight, "rightAnkle": ankleRight, "rightFoot": footRight}
+
+        CreateBuild.skeletonDict = initialDict
+        StashPosition.stash = copy.deepcopy(CreateBuild.skeletonDict)
+
         for jointName, joint in CreateBuild.skeletonDict.items():
             StashPosition.basePosDict[joint["joint"]] = {"posX": joint["posX"], "posY": joint["posY"], "posZ": joint["posZ"]}
+        StashPosition.posesDict["base"] = StashPosition.basePosDict
+
         StashPosition(jointList=RotatePos(parent="leftShoulder", degree=-30.0).rotY(), poseName="posOne").relativeToBasePos()
+        StashPosition(jointList=RotatePos(parent="leftShoulder", degree=0).rotY(), poseName="posTwo").relativeToBasePos()
+        StashPosition(jointList=RotatePos(parent="leftShoulder", degree=-30.0).rotY(), poseName="posThree").relativeToBasePos()
 
 
 class Controls:
@@ -77,7 +56,6 @@ class RotatePos:
         self.rotationDegree = degree
 
     def rotY(self):
-        cmds.rotate(0, str(self.rotationDegree) + "deg", 0, self.parent["joint"])
         self.parent["rotateY"] = self.rotationDegree
         for joint in self.childList:
             angleSin = math.sin(self.rotationDegree)
@@ -95,14 +73,12 @@ class RotatePos:
             x_move = joint["posX"] + self.parent["posX"]
             z_move = joint["posZ"] + self.parent["posZ"]
 
-            cmds.move(x_move, joint["posY"], z_move, joint["joint"])
-
             joint["posX"] = x_move
             joint["posZ"] = z_move
+
         return self.childList
 
     def rotX(self):
-        cmds.rotate(str(self.rotationDegree) + "deg", 0, 0, self.parent["joint"])
         self.parent["rotateX"] = self.rotationDegree
         for joint in self.childList:
             angleSin = math.sin(self.rotationDegree)
@@ -120,14 +96,12 @@ class RotatePos:
             y_move = joint["posY"] + self.parent["posY"]
             z_move = joint["posZ"] + self.parent["posZ"]
 
-            cmds.move(joint["posX"], y_move, z_move, joint["joint"])
-
             joint["posY"] = y_move
             joint["posZ"] = z_move
+
         return self.childList
 
     def rotZ(self):
-        cmds.rotate(0, 0, str(self.rotationDegree) + "deg",  self.parent["joint"])
         self.parent["rotateZ"] = self.rotationDegree
         for joint in self.childList:
             angleSin = math.sin(self.rotationDegree)
@@ -145,10 +119,9 @@ class RotatePos:
             x_move = joint["posX"] + self.parent["posX"]
             y_move = joint["posY"] + self.parent["posY"]
 
-            cmds.move(x_move, y_move, joint["posZ"], joint["joint"])
-
             joint["posX"] = x_move
             joint["posY"] = y_move
+
         return self.childList
 
 
@@ -186,8 +159,7 @@ class LoadClipOne:
 
     def load(self):
         Clips().PosInit(time=0)
-        Clips().PosOne(time=1)
-        Clips().PosTwo(time=3)
+        Clips().Poses(time=1, loadingList=["base", "posOne", "posTwo", "posThree"])
 
 
 class Clips:
@@ -197,42 +169,37 @@ class Clips:
             cmds.setKeyframe(joint["joint"] + '.ty', edit=True, time=(calcFrames()[time], calcFrames()[time]))
             cmds.setKeyframe(joint["joint"] + '.tz', edit=True, time=(calcFrames()[time], calcFrames()[time]))
 
-    def PosOne(self, time):
-        keyedList_1 = RotatePos(parent="leftShoulder", degree=30.0).rotY()
-        for items in keyedList_1:
-            cmds.setKeyframe(items["joint"] + '.tx', edit=True, time=(calcFrames()[time], calcFrames()[time+1]))
-            cmds.setKeyframe(items["joint"] + '.ty', edit=True, time=(calcFrames()[time], calcFrames()[time+1]))
-            cmds.setKeyframe(items["joint"] + '.tz', edit=True, time=(calcFrames()[time], calcFrames()[time+1]))
-    def PosTwo(self, time):
-        keyedList_1 = RotatePos(parent="leftShoulder", degree=-30.0).rotY()
-        for items in keyedList_1:
-            cmds.setKeyframe(items["joint"] + '.tx', edit=True, time=(calcFrames()[time], calcFrames()[time+1]))
-            cmds.setKeyframe(items["joint"] + '.ty', edit=True, time=(calcFrames()[time], calcFrames()[time+1]))
-            cmds.setKeyframe(items["joint"] + '.tz', edit=True, time=(calcFrames()[time], calcFrames()[time+1]))
-        keyedList_2 = RotatePos(parent="leftShoulder", degree=-30.0).rotZ()
-        for items in keyedList_2:
-            cmds.setKeyframe(items["joint"] + '.tx', edit=True, time=(calcFrames()[time], calcFrames()[time+1]))
-            cmds.setKeyframe(items["joint"] + '.ty', edit=True, time=(calcFrames()[time], calcFrames()[time+1]))
-            cmds.setKeyframe(items["joint"] + '.tz', edit=True, time=(calcFrames()[time], calcFrames()[time+1]))
+    def Poses(self, time, loadingList):
+        num = 0
+        for pose in loadingList:
+            num += 1
+            for joint in StashPosition.posesDict[pose]:
+                cmds.setKeyframe(joint, attribute='translateX',
+                                 t=[calcFrames()[time + num], calcFrames()[time + num + 1]],
+                                 v=StashPosition.posesDict[pose][joint]["posX"])
+                cmds.setKeyframe(joint, attribute='translateY',
+                                 t=[calcFrames()[time + num], calcFrames()[time + num + 1]],
+                                 v=StashPosition.posesDict[pose][joint]["posY"])
+                cmds.setKeyframe(joint, attribute='translateZ',
+                                 t=[calcFrames()[time + num], calcFrames()[time + num + 1]],
+                                 v=StashPosition.posesDict[pose][joint]["posZ"])
 
 
 class StashPosition:
     basePosDict = {}
     posesDict = {}
-    stash = {}
+    stash = None
 
     def __init__(self, jointList, poseName):
         self.jointList = jointList
         self.poseName = poseName
-        poseDict = {"new": {}, "base": StashPosition.basePosDict}
-        StashPosition.posesDict[self.poseName] = poseDict
+        StashPosition.posesDict[self.poseName] = {}
 
     def relativeToBasePos(self):
         for x in self.jointList:
-            StashPosition.posesDict[self.poseName]["new"][x["joint"]] \
-                = {"posX": x["posX"], "posY": x["posY"], "posZ": x["posZ"]}
+            StashPosition.posesDict[self.poseName][x["joint"]] = {"posX": x["posX"], "posY": x["posY"], "posZ": x["posZ"]}
 
-        print(StashPosition.posesDict)
+        CreateBuild.skeletonDict = StashPosition.stash
 
 
 def reset():
@@ -240,12 +207,8 @@ def reset():
 
 
 def calcFrames():
-    frameCount = 6
+    frameCount = 8
     returnList = []
     for x in range(frameCount):
         returnList.append((Play.frameNum/frameCount)*x)
     return returnList
-
-
-def delFrames(object):
-    cmds.cutKey(object, time=(0, MAX_TIME), attribute='translateX', option="keys" )
