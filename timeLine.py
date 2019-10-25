@@ -127,6 +127,20 @@ class RotatePos:
         return self.childList
 
 
+class MovePos:
+    def __init__(self):
+        pass
+
+    def moveX(self):
+        pass
+
+    def moveY(self):
+        pass
+
+    def moveZ(self):
+        pass
+
+
 class Play:
     frameNum = 10
     distX = 0
