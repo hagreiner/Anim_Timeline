@@ -201,13 +201,13 @@ class LoadClipOne:
         self.deltaPercent = cmds.floatSliderGrp("deltaScale", query=True, value=True)
 
         posOneList = StashPosition(jointList=30.0 * self.deltaPercent, parent="leftShoulder", poseName="posOne",
-                                   direction="y").relativeToBasePos()
+                                   direction="y", fromA=0).relativeToBasePos()
         posTwoList = StashPosition(jointList=-90.0 * self.deltaPercent, parent="leftShoulder", poseName="posTwo",
-                                   direction="y").relativeToBasePos()
+                                   direction="y", fromA=30).relativeToBasePos()
         posThreeList = StashPosition(jointList=30.0 * self.deltaPercent, parent="rightKnee", poseName="posKneeOne",
-                                     direction="x").relativeToBasePos()
+                                     direction="x", fromA=0).relativeToBasePos()
         posFourList = StashPosition(jointList=0.0 * self.deltaPercent, parent="rightKnee", poseName="posKneeTwo",
-                                    direction="x").relativeToBasePos()
+                                    direction="x", fromA=30).relativeToBasePos()
         # list or pose keys for lerping well
         CreateDelta(
             posTwoList, posFourList
@@ -251,11 +251,13 @@ class StashPosition:
     posesDict = {}
     stash = None
 
-    def __init__(self, jointList, poseName, parent, direction):
+    def __init__(self, jointList, poseName, parent, direction, fromA):
         self.jointList = []
         if direction == "x":
             for x in range(int(jointList/5) + 1):
-                self.jointList.append(RotatePos(parent=parent, degree=(x * 5)).rotX())
+                deg = (x * 5)
+                if (fromA >= jointList and deg >= jointList) or (fromA <= jointList and deg >= fromA):
+                    self.jointList.append(RotatePos(parent=parent, degree=(x * 5)).rotX())
             if len(self.jointList) == 0:
                 self.jointList = [RotatePos(parent=parent, degree=(0)).rotX()]
         if direction == "y":
