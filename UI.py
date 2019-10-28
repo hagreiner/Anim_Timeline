@@ -47,10 +47,13 @@ class MainUI:
         cmds.intSliderGrp("frameNum", label="Number of Frames", field=True,
                           minValue=MIN_TIME, maxValue=MAX_TIME, value=MIN_TIME,
                           columnWidth=[(1, 100), (2, 50), (3, WIDTH-125)],  cal=[1, "center"])
+        cmds.floatSliderGrp("deltaScale", label="Scale", field=True,
+                            minValue=0, maxValue=1, value=0.5,
+                            columnWidth=[(1, 100), (2, 50), (3, WIDTH-125)],  cal=[1, "center"])
 
         cmds.rowColumnLayout(numberOfColumns=1, columnWidth=[(1, self.width)], parent=self.column)
         cmds.button(label="PLAY", command=lambda args: Play().forwards())
-        cmds.button(label="REVERSE", command=lambda args: Play().backwards())
+        # cmds.button(label="REVERSE", command=lambda args: Play().backwards())
         cmds.button(label="STOP", command=lambda args: Play().stop())
         cmds.button(label="RESET", command=lambda args: reset())
         cmds.button(label="QUIT", command=lambda args: end())

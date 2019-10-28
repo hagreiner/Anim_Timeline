@@ -30,12 +30,6 @@ class CreateBuild:
             StashPosition.basePosDict[joint["joint"]] = {"posX": joint["posX"], "posY": joint["posY"], "posZ": joint["posZ"]}
         StashPosition.posesDict["base"] = StashPosition.basePosDict
 
-        StashPosition(jointList=RotatePos(parent="leftShoulder", degree=-30.0).rotY(), poseName="posOne").relativeToBasePos()
-        StashPosition(jointList=RotatePos(parent="leftShoulder", degree=0).rotY(), poseName="posTwo").relativeToBasePos()
-        StashPosition(jointList=RotatePos(parent="leftShoulder", degree=-30.0).rotY(), poseName="posThree").relativeToBasePos()
-        StashPosition(jointList=RotatePos(parent="rightKnee", degree=30.0).rotX(), poseName="posKneeOne").relativeToBasePos()
-        StashPosition(jointList=RotatePos(parent="rightKnee", degree=0).rotX(), poseName="posKneeTwo").relativeToBasePos()
-
 
 class Controls:
     def findChildren(self, joint):
@@ -58,7 +52,6 @@ class RotatePos:
         self.rotationDegree = degree
 
     def rotY(self):
-        self.parent["rotateY"] = self.rotationDegree
         for joint in self.childList:
             angleSin = math.sin(self.rotationDegree)
             angleCos = math.cos(self.rotationDegree)
@@ -69,8 +62,8 @@ class RotatePos:
             tempX = joint["posX"]
             tempZ = joint["posZ"]
 
-            joint["posX"] = tempX * angleCos + tempZ * angleSin
-            joint["posZ"] = -1 * tempX * angleSin + tempZ * angleCos
+            joint["posZ"] = tempZ * angleCos + tempX * angleSin
+            joint["posX"] = -1 * tempZ * angleSin + tempX * angleCos
 
             x_move = joint["posX"] + self.parent["posX"]
             z_move = joint["posZ"] + self.parent["posZ"]
@@ -81,7 +74,6 @@ class RotatePos:
         return self.childList
 
     def rotX(self):
-        self.parent["rotateX"] = self.rotationDegree
         for joint in self.childList:
             angleSin = math.sin(self.rotationDegree)
             angleCos = math.cos(self.rotationDegree)
@@ -104,7 +96,6 @@ class RotatePos:
         return self.childList
 
     def rotZ(self):
-        self.parent["rotateZ"] = self.rotationDegree
         for joint in self.childList:
             angleSin = math.sin(self.rotationDegree)
             angleCos = math.cos(self.rotationDegree)
@@ -128,17 +119,49 @@ class RotatePos:
 
 
 class MovePos:
-    def __init__(self):
-        pass
+    def __init__(self, parent, movement):
+        self.childList = Controls().findChildren(joint=parent)
+        self.parent = CreateBuild.skeletonDict[parent]
+        self.moveAmount = movement
 
     def moveX(self):
-        pass
+        self.parent["posX"] += self.moveAmount
+        for joint in self.childList:
+            joint["posX"] += self.moveAmount
+
+        return self.childList
 
     def moveY(self):
-        pass
+        self.parent["posY"] += self.moveAmount
+        for joint in self.childList:
+            joint["posY"] += self.moveAmount
+
+        return self.childList
 
     def moveZ(self):
-        pass
+        self.parent["posZ"] += self.moveAmount
+        for joint in self.childList:
+            joint["posZ"] += self.moveAmount
+
+        return self.childList
+
+
+class CreateDelta:
+    deltaDict = {}
+
+    def __init__(self, *args):
+        self.args = args
+
+    def addDelta(self, deltaName):
+        deltaList = []
+        for smallList in self.args:
+            tempList = []
+            for item in smallList:
+                tempList.append(StashPosition.posesDict[item])
+            deltaList.append(tempList)
+
+        CreateDelta.deltaDict[deltaName] = deltaList
+        # creates a list of dictionaries of joint positions
 
 
 class Play:
@@ -146,6 +169,7 @@ class Play:
     distX = 0
 
     def __init__(self):
+        reset()
         Play.frameNum = cmds.intSliderGrp("frameNum", query=True, value=True)
         cmds.playbackOptions(minTime='0sec', maxTime=str(Play.frameNum/30.0) + 'sec')
         cmds.select(all=True)
@@ -174,32 +198,52 @@ class LoadClipOne:
             self.direction = Play.distX
 
     def load(self):
+        self.deltaPercent = cmds.floatSliderGrp("deltaScale", query=True, value=True)
+
+        posOneList = StashPosition(jointList=30.0 * self.deltaPercent, parent="leftShoulder", poseName="posOne",
+                                   direction="y").relativeToBasePos()
+        posTwoList = StashPosition(jointList=-90.0 * self.deltaPercent, parent="leftShoulder", poseName="posTwo",
+                                   direction="y").relativeToBasePos()
+        posThreeList = StashPosition(jointList=30.0 * self.deltaPercent, parent="rightKnee", poseName="posKneeOne",
+                                     direction="x").relativeToBasePos()
+        posFourList = StashPosition(jointList=0.0 * self.deltaPercent, parent="rightKnee", poseName="posKneeTwo",
+                                    direction="x").relativeToBasePos()
+        # list or pose keys for lerping well
+        CreateDelta(
+            posTwoList, posFourList
+        ).addDelta(deltaName="deltaOne")
+        CreateDelta(
+            # StashPosition.posesDict["posTwo"],
+            posOneList, posThreeList
+        ).addDelta(deltaName="deltaTwo")
+
         Clips().PosInit(time=0)
-        Clips().Poses(time=1, loadingList=["base", "posOne", "posTwo", "posThree"])
-        Clips().Poses(time=1, loadingList=["base", "posKneeOne", "posKneeTwo", "posKneeOne"])
+        newTime = Clips().Poses(time=1, loadingList="deltaOne")
+        newTime = Clips().Poses(time=newTime + 1, loadingList="deltaTwo")
+        newTime = Clips().Poses(time=newTime + 1, loadingList="deltaOne")
 
 
 class Clips:
     def PosInit(self, time):
-        for jointName, joint in CreateBuild.skeletonDict.items():
-            cmds.setKeyframe(joint["joint"] + '.tx', edit=True, time=(calcFrames()[time], calcFrames()[time]))
-            cmds.setKeyframe(joint["joint"] + '.ty', edit=True, time=(calcFrames()[time], calcFrames()[time]))
-            cmds.setKeyframe(joint["joint"] + '.tz', edit=True, time=(calcFrames()[time], calcFrames()[time]))
+        for jointName, joint in StashPosition.stash.items():
+            cmds.setKeyframe(joint["joint"] + '.tx', v=joint["posX"], time=(calcFrames()[time], calcFrames()[time]))
+            cmds.setKeyframe(joint["joint"] + '.ty', v=joint["posY"], time=(calcFrames()[time], calcFrames()[time]))
+            cmds.setKeyframe(joint["joint"] + '.tz', v=joint["posZ"], time=(calcFrames()[time], calcFrames()[time]))
 
     def Poses(self, time, loadingList):
-        num = 0
-        for pose in loadingList:
-            num += 1
-            for joint in StashPosition.posesDict[pose]:
-                cmds.setKeyframe(joint, attribute='translateX',
-                                 t=[calcFrames()[time + num], calcFrames()[time + num + 1]],
-                                 v=StashPosition.posesDict[pose][joint]["posX"])
-                cmds.setKeyframe(joint, attribute='translateY',
-                                 t=[calcFrames()[time + num], calcFrames()[time + num + 1]],
-                                 v=StashPosition.posesDict[pose][joint]["posY"])
-                cmds.setKeyframe(joint, attribute='translateZ',
-                                 t=[calcFrames()[time + num], calcFrames()[time + num + 1]],
-                                 v=StashPosition.posesDict[pose][joint]["posZ"])
+        for poseList in CreateDelta.deltaDict[loadingList]:
+            for pose in poseList:
+                time_alt = time
+                for joint, jointDict in pose.items():
+                    cmds.setKeyframe(joint, attribute='translateX',
+                                     t=calcFrames()[time_alt], v=jointDict["posX"])
+                    cmds.setKeyframe(joint, attribute='translateY',
+                                     t=calcFrames()[time_alt], v=jointDict["posY"])
+                    cmds.setKeyframe(joint, attribute='translateZ',
+                                     t=calcFrames()[time_alt], v=jointDict["posZ"])
+                time_alt += 1
+
+        return time
 
 
 class StashPosition:
@@ -207,16 +251,39 @@ class StashPosition:
     posesDict = {}
     stash = None
 
-    def __init__(self, jointList, poseName):
-        self.jointList = jointList
+    def __init__(self, jointList, poseName, parent, direction):
+        self.jointList = []
+        if direction == "x":
+            for x in range(int(jointList/5) + 1):
+                self.jointList.append(RotatePos(parent=parent, degree=(x * 5)).rotX())
+            if len(self.jointList) == 0:
+                self.jointList = [RotatePos(parent=parent, degree=(0)).rotX()]
+        if direction == "y":
+            for x in range(int(jointList/10) + 1):
+                self.jointList.append(RotatePos(parent=parent, degree=(x * 10)).rotY())
+            if len(self.jointList) == 0:
+                self.jointList = [RotatePos(parent=parent, degree=(0)).rotY()]
+        if direction == "z":
+            for x in range(int(jointList/10) + 1):
+                self.jointList.append(RotatePos(parent=parent, degree=(x * 10)).rotZ())
+            if len(self.jointList) == 0:
+                self.jointList = [RotatePos(parent=parent, degree=(0)).rotZ()]
         self.poseName = poseName
-        StashPosition.posesDict[self.poseName] = {}
 
     def relativeToBasePos(self):
-        for x in self.jointList:
-            StashPosition.posesDict[self.poseName][x["joint"]] = {"posX": x["posX"], "posY": x["posY"], "posZ": x["posZ"]}
+        count = 1
+        poseNames = []
+        for y in self.jointList:
+            poseName = self.poseName
+            poseName += "_" + num2words(count)
+            poseNames.append(poseName)
+            StashPosition.posesDict[poseName] = {}
+            for x in y:
+                StashPosition.posesDict[poseName][x["joint"]] = {"posX": x["posX"], "posY": x["posY"], "posZ": x["posZ"]}
+            count += 1
 
-        CreateBuild.skeletonDict = StashPosition.stash
+        CreateBuild.skeletonDict = copy.deepcopy(StashPosition.stash)
+        return poseNames
 
 
 def reset():
@@ -229,3 +296,10 @@ def calcFrames():
     for x in range(frameCount):
         returnList.append((Play.frameNum/frameCount)*x)
     return returnList
+
+
+def num2words(num):
+    under_20 = ['Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven',
+                'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen']
+    if num < 20:
+        return under_20[num]
