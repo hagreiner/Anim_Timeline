@@ -1,6 +1,7 @@
 import maya.cmds as cmds
 from constants import WIDTH, MAX_TIME, MIN_TIME, MAX_X_DIST, MIN_X_DIST
 from timeLine import CreateBuild, Play
+import openMayaStuff
 
 
 def start():
@@ -57,6 +58,7 @@ class MainUI:
         cmds.button(label="STOP", command=lambda args: Play().stop())
         cmds.button(label="RESET", command=lambda args: reset())
         cmds.button(label="QUIT", command=lambda args: end())
+        cmds.button(label="DEMO", command=lambda args: openMayaStuff.demo())
         cmds.showWindow(self.window)
 
 

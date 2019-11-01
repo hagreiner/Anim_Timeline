@@ -9,11 +9,12 @@ Step Two:
 Step Three:
     Paste the code below into a Python tab (NOT THE MEL ONE!! IT WONT WORK)
 
-from Anim_Timeline import UI, constants, timeLine, objects
+from Anim_Timeline import UI, constants, timeLine, objects, openMayaStuff
 reload(UI)
 reload(constants)
 reload(timeLine)
 reload(objects)
+reload(openMayaStuff)
 UI.start()
 
 Step Four:

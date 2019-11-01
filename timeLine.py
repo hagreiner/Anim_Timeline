@@ -51,6 +51,9 @@ class RotatePos:
         self.parent = CreateBuild.skeletonDict[parent]
         self.rotationDegree = degree
 
+    def rotation(self):
+        pass
+
     def rotY(self):
         for joint in self.childList:
             angleSin = math.sin(self.rotationDegree)
