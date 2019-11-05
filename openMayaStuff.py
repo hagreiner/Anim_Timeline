@@ -34,10 +34,4 @@ def demo():
     for x in range(10):
         xform.rotateBy(step, om.MSpace.kObject)
         cmds.refresh()
-        time.sleep(0.1)
-
-    joint = cmds.joint(p=(1, 1, 1))
-    print cmds.xform(joint, bb=True, query=True)
-    print cmds.xform(joint, bbi=True, query=True)
-    joint = cmds.polyCube()
-    print cmds.xform(joint[0] + ".f[2]", bb=True, query=True)
+        time.sleep(0.05)
