@@ -157,10 +157,10 @@ class CreateDelta:
 
     def addDelta(self, deltaName):
         deltaList = []
-        for smallList in self.args:
+        for touplePack in self.args:
             tempList = []
-            for item in smallList:
-                tempList.append(StashPosition.posesDict[item])
+            for item in touplePack[1]:
+                tempList.append(StashPosition.posesDict[touplePack[0]][item])
             deltaList.append(tempList)
 
         CreateDelta.deltaDict[deltaName] = deltaList
@@ -203,14 +203,14 @@ class LoadClipOne:
     def load(self):
         self.deltaPercent = cmds.floatSliderGrp("deltaScale", query=True, value=True)
 
-        posOneList = StashPosition(jointList=30.0 * self.deltaPercent, parent="leftShoulder", poseName="posOne",
-                                   direction="y", fromA=0).relativeToBasePos()
-        posTwoList = StashPosition(jointList=-90.0 * self.deltaPercent, parent="leftShoulder", poseName="posTwo",
-                                   direction="y", fromA=30).relativeToBasePos()
-        posThreeList = StashPosition(jointList=30.0 * self.deltaPercent, parent="rightKnee", poseName="posKneeOne",
-                                     direction="x", fromA=0).relativeToBasePos()
-        posFourList = StashPosition(jointList=0.0 * self.deltaPercent, parent="rightKnee", poseName="posKneeTwo",
-                                    direction="x", fromA=30).relativeToBasePos()
+        posOneList = StashPosition(jointList=1 * self.deltaPercent, parent="leftShoulder", poseName="posOne",
+                                   direction="z", fromA=0).relativeToBasePos()
+        posTwoList = StashPosition(jointList=0.5 * self.deltaPercent, parent="leftShoulder", poseName="posTwo",
+                                   direction="z", fromA=1 * self.deltaPercent).relativeToBasePos()
+        posThreeList = StashPosition(jointList=1.25 * self.deltaPercent, parent="rightKnee", poseName="posKneeOne",
+                                     direction="x", fromA=1 * self.deltaPercent).relativeToBasePos()
+        posFourList = StashPosition(jointList=1.5 * self.deltaPercent, parent="rightKnee", poseName="posKneeTwo",
+                                    direction="x", fromA=1.25 * self.deltaPercent).relativeToBasePos()
         # list or pose keys for lerping well
         CreateDelta(
             posTwoList, posFourList
@@ -221,9 +221,10 @@ class LoadClipOne:
         ).addDelta(deltaName="deltaTwo")
 
         Clips().PosInit(time=0)
-        newTime = Clips().Poses(time=1, loadingList="deltaOne")
+        newTime = Clips().Poses(time=0, loadingList="deltaOne")
         newTime = Clips().Poses(time=newTime + 1, loadingList="deltaTwo")
         newTime = Clips().Poses(time=newTime + 1, loadingList="deltaOne")
+        # cmds.playbackOptions(minTime='0sec', maxTime=str(newTime) + 'sec')
 
 
 class Clips:
@@ -235,8 +236,8 @@ class Clips:
 
     def Poses(self, time, loadingList):
         for poseList in CreateDelta.deltaDict[loadingList]:
+            time_alt = time
             for pose in poseList:
-                time_alt = time
                 for joint, jointDict in pose.items():
                     cmds.setKeyframe(joint, attribute='translateX',
                                      t=calcFrames()[time_alt], v=jointDict["posX"])
@@ -245,6 +246,7 @@ class Clips:
                     cmds.setKeyframe(joint, attribute='translateZ',
                                      t=calcFrames()[time_alt], v=jointDict["posZ"])
                 time_alt += 1
+            time_alt += 1
 
         return time
 
@@ -256,39 +258,43 @@ class StashPosition:
 
     def __init__(self, jointList, poseName, parent, direction, fromA):
         self.jointList = []
+        divNum = 0.25
         if direction == "x":
-            for x in range(int(jointList/5) + 1):
-                deg = (x * 5)
+            for x in range(int(jointList/divNum)):
+                deg = (x * 1)
                 if (fromA >= jointList and deg >= jointList) or (fromA <= jointList and deg >= fromA):
-                    self.jointList.append(RotatePos(parent=parent, degree=(x * 5)).rotX())
+                    self.jointList.append(RotatePos(parent=parent, degree=(x * divNum)).rotX())
             if len(self.jointList) == 0:
                 self.jointList = [RotatePos(parent=parent, degree=(0)).rotX()]
         if direction == "y":
-            for x in range(int(jointList/10) + 1):
-                self.jointList.append(RotatePos(parent=parent, degree=(x * 10)).rotY())
+            for x in range(int(jointList/divNum)):
+                deg = (x * 1)
+                if (fromA >= jointList and deg >= jointList) or (fromA <= jointList and deg >= fromA):
+                    self.jointList.append(RotatePos(parent=parent, degree=(x * 1)).rotY())
             if len(self.jointList) == 0:
                 self.jointList = [RotatePos(parent=parent, degree=(0)).rotY()]
         if direction == "z":
-            for x in range(int(jointList/10) + 1):
-                self.jointList.append(RotatePos(parent=parent, degree=(x * 10)).rotZ())
+            for x in range(int(jointList/divNum)):
+                deg = (x * 1)
+                if (fromA >= jointList and deg >= jointList) or (fromA <= jointList and deg >= fromA):
+                    self.jointList.append(RotatePos(parent=parent, degree=(x * divNum)).rotZ())
             if len(self.jointList) == 0:
                 self.jointList = [RotatePos(parent=parent, degree=(0)).rotZ()]
         self.poseName = poseName
 
     def relativeToBasePos(self):
-        count = 1
+        count = 0
         poseNames = []
+        StashPosition.posesDict[self.poseName] = {}
         for y in self.jointList:
-            poseName = self.poseName
-            poseName += "_" + num2words(count)
-            poseNames.append(poseName)
-            StashPosition.posesDict[poseName] = {}
+            poseNames.append(int(count))
+            StashPosition.posesDict[self.poseName][int(count)] = {}
             for x in y:
-                StashPosition.posesDict[poseName][x["joint"]] = {"posX": x["posX"], "posY": x["posY"], "posZ": x["posZ"]}
+                StashPosition.posesDict[self.poseName][int(count)][x["joint"]] = {"posX": x["posX"], "posY": x["posY"], "posZ": x["posZ"]}
             count += 1
 
         CreateBuild.skeletonDict = copy.deepcopy(StashPosition.stash)
-        return poseNames
+        return (self.poseName, poseNames)
 
 
 def reset():
@@ -296,15 +302,8 @@ def reset():
 
 
 def calcFrames():
-    frameCount = 8
+    frameCount = 150
     returnList = []
     for x in range(frameCount):
         returnList.append((Play.frameNum/frameCount)*x)
     return returnList
-
-
-def num2words(num):
-    under_20 = ['Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven',
-                'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen']
-    if num < 20:
-        return under_20[num]

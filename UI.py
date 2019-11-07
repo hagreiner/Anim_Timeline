@@ -49,7 +49,7 @@ class MainUI:
                           minValue=MIN_TIME, maxValue=MAX_TIME, value=MIN_TIME,
                           columnWidth=[(1, 100), (2, 50), (3, WIDTH-125)],  cal=[1, "center"])
         cmds.floatSliderGrp("deltaScale", label="Scale", field=True,
-                            minValue=0, maxValue=1, value=0.5,
+                            minValue=0, maxValue=1, value=0.5, s=0.01,
                             columnWidth=[(1, 100), (2, 50), (3, WIDTH-125)],  cal=[1, "center"])
 
         cmds.rowColumnLayout(numberOfColumns=1, columnWidth=[(1, self.width)], parent=self.column)
