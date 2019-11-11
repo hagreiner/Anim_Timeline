@@ -200,29 +200,57 @@ class LoadClipOne:
         else:
             self.direction = Play.distX
 
-    def load(self):
         self.deltaPercent = cmds.floatSliderGrp("deltaScale", query=True, value=True)
+        self.armScale = cmds.floatSlider("armScale", query=True, value=True)
+        self.legScale = cmds.floatSlider("legScale", query=True, value=True)
+        self.tiltScale = cmds.floatSlider("tiltScale", query=True, value=True)
 
-        posOneList = StashPosition(jointList=1 * self.deltaPercent, parent="leftShoulder", poseName="posOne",
+    def load(self):
+        posLeftArmOne = StashPosition(jointList=1 * self.armScale, parent="leftShoulder", poseName="posOne",
                                    direction="z", fromA=0).relativeToBasePos()
-        posTwoList = StashPosition(jointList=0.5 * self.deltaPercent, parent="leftShoulder", poseName="posTwo",
-                                   direction="z", fromA=1 * self.deltaPercent).relativeToBasePos()
-        posThreeList = StashPosition(jointList=1.25 * self.deltaPercent, parent="rightKnee", poseName="posKneeOne",
-                                     direction="x", fromA=1 * self.deltaPercent).relativeToBasePos()
-        posFourList = StashPosition(jointList=1.5 * self.deltaPercent, parent="rightKnee", poseName="posKneeTwo",
-                                    direction="x", fromA=1.25 * self.deltaPercent).relativeToBasePos()
+        posLeftArmTwo = StashPosition(jointList=0.5 * self.armScale, parent="leftShoulder", poseName="posTwo",
+                                   direction="z", fromA=1 * self.armScale).relativeToBasePos()
+        posRightArmOne = StashPosition(jointList=1 * self.armScale, parent="rightShoulder", poseName="posRightOne",
+                                   direction="z", fromA=0).relativeToBasePos()
+        posRightArmTwo = StashPosition(jointList=0.5 * self.armScale, parent="rightShoulder", poseName="posRightTwo",
+                                   direction="z", fromA=1 * self.armScale).relativeToBasePos()
+
+        posKneeRightOne = StashPosition(jointList=4.0 * self.legScale, parent="rightKnee", poseName="posKneeOne",
+                                     direction="x", fromA=1 * self.legScale).relativeToBasePos()
+        posKneeRightTwo = StashPosition(jointList=5.5 * self.legScale, parent="rightKnee", poseName="posKneeTwo",
+                                    direction="x", fromA=4.0 * self.legScale).relativeToBasePos()
+        posKneeLeftOne = StashPosition(jointList=0 * self.legScale, parent="leftKnee", poseName="posKneeLOne",
+                                     direction="x", fromA=0 * self.legScale).relativeToBasePos()
+        posKneeLeftTwo = StashPosition(jointList=4.0 * self.legScale, parent="leftKnee", poseName="posKneeLTwo",
+                                     direction="x", fromA=1 * self.legScale).relativeToBasePos()
+        posKneeLeftThree = StashPosition(jointList=5.5 * self.legScale, parent="leftKnee", poseName="posKneeLThree",
+                                    direction="x", fromA=4.0 * self.legScale).relativeToBasePos()
+
+        posTiltOne = StashPosition(jointList=0.0 * self.tiltScale, parent="hipCenter", poseName="posTiltOne",
+                                    direction="y", fromA=0 * self.tiltScale).relativeToBasePos()
+        posTiltTwo = StashPosition(jointList=25 * self.tiltScale, parent="hipCenter", poseName="posTiltTwo",
+                                    direction="y", fromA=0 * self.tiltScale).relativeToBasePos()
+        posTiltThree = StashPosition(jointList=0.0 * self.tiltScale, parent="hipCenter", poseName="posTiltThree",
+                                    direction="z", fromA=0 * self.tiltScale).relativeToBasePos()
+        posTiltFour = StashPosition(jointList=0.9 * self.tiltScale, parent="hipCenter", poseName="posTiltFour",
+                                    direction="z", fromA=0 * self.tiltScale).relativeToBasePos()
         # list or pose keys for lerping well
         CreateDelta(
-            posTwoList, posFourList
+            posLeftArmOne, posRightArmOne, posKneeRightOne, posTiltOne, posKneeLeftOne
         ).addDelta(deltaName="deltaOne")
         CreateDelta(
             # StashPosition.posesDict["posTwo"],
-            posOneList, posThreeList
+            posLeftArmTwo, posRightArmTwo, posKneeRightTwo, posTiltThree, posKneeLeftTwo,
         ).addDelta(deltaName="deltaTwo")
+        CreateDelta(
+            # StashPosition.posesDict["posTwo"],
+            posTiltTwo, posTiltFour, posKneeLeftThree
+        ).addDelta(deltaName="deltaThree")
 
         Clips().PosInit(time=0)
         newTime = Clips().Poses(time=0, loadingList="deltaOne")
         newTime = Clips().Poses(time=newTime + 1, loadingList="deltaTwo")
+        newTime = Clips().Poses(time=newTime + 1, loadingList="deltaThree")
         newTime = Clips().Poses(time=newTime + 1, loadingList="deltaOne")
         # cmds.playbackOptions(minTime='0sec', maxTime=str(newTime) + 'sec')
 

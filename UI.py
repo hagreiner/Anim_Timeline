@@ -67,11 +67,11 @@ class MainUI:
 
         cmds.rowColumnLayout(numberOfColumns=2, columnWidth=[(1, self.width/4.0), (2, self.width/4.0 * 3)], parent=self.column)
         cmds.text("Legs Scale", h=20)
-        cmds.floatSlider("legScale", minValue=0, maxValue=1, value=0.5, s=0.01)
+        cmds.floatSlider("legScale", minValue=1.0, maxValue=1.05, value=1.0, s=0.01)
         cmds.text("Arms Scale", h=20)
-        cmds.floatSlider("armScale", minValue=0, maxValue=1, value=0.5, s=0.01)
+        cmds.floatSlider("armScale", minValue=0.5, maxValue=1, value=0.5, s=0.01)
         cmds.text("Tilt Scale", h=20)
-        cmds.floatSlider("tiltScale", minValue=0, maxValue=1, value=0.5, s=0.01)
+        cmds.floatSlider("tiltScale", minValue=-0.3, maxValue=0.5, value=-0.3, s=0.01)
 
         cmds.rowColumnLayout(numberOfColumns=1, columnWidth=[(1, self.width)], parent=self.column)
         cmds.separator()
