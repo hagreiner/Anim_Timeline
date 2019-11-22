@@ -5,16 +5,10 @@ import openMayaStuff
 
 
 def start():
-    if cmds.window("build", exists=True):
-        cmds.deleteUI("build", window=True)
-
-    if cmds.window("props", exists=True):
-        cmds.deleteUI("props", window=True)
-
     cmds.currentUnit(time='ntsc')
     reset()
 
-    MainUI().baseUI()
+    MainMenu().start()
 
 
 def end():
@@ -25,11 +19,28 @@ def end():
         cmds.deleteUI("window", window=True)
 
 
-class MainUI:
+class MainMenu:
+    def __init__(self):
+        self.col = "mainCol"
+        self.window = "mainUI"
+        self.width = 300
+#10842
+    def start(self):
+        self.col = cmds.columnLayout(self.col, parent="UIwindow", w=self.width)
+
+        #put this at end
+        winHeight = 0
+        for child in cmds.columnLayout(self.col, q=1, ca=1):
+            winHeight += eval('cmds.' + cmds.objectTypeUI(child) + '("' + child + '", q=1, h=1)')
+        cmds.window(self.window, e=1, h=winHeight)
+        cmds.showWindow(self.window)
+
+
+class OrganicAnim:
     def __init__(self):
         self.width = WIDTH
-        self.window = "window"
-        self.column = "col"
+        self.window = "animWindow"
+        self.column = "animCol"
 
         if cmds.window(self.window, exists=True):
             cmds.deleteUI(self.window, window=True)
@@ -97,3 +108,10 @@ class MainUI:
 
 def reset():
     cmds.currentTime(0, edit=True)
+
+
+def frameCollapseChanged(mainLayout):
+    cmds.evalDeferred(
+        "mc.window('UIwindow', e=1, h=sum([eval('mc.' + mc.objectTypeUI(child) + '(\\'' + child + '\\', q=1, h=1)') "
+        "for child in mc.columnLayout('" + mainLayout + "', q=1, ca=1)]))")
+
