@@ -226,6 +226,11 @@ class LoadClipOne:
         posKneeLeftThree = StashPosition(jointList=5.5 * self.legScale, parent="leftKnee", poseName="posKneeLThree",
                                     direction="x", fromA=4.0 * self.legScale).relativeToBasePos()
 
+        posRightHipOne = StashPosition(jointList=0.1 * self.legScale, parent="rightHip", poseName="posHipRightOne",
+                                   direction="x", fromA=0 * self.legScale).relativeToBasePos()
+        posRightHipTwo = StashPosition(jointList=2 * self.legScale, parent="rightHip", poseName="posHipRightTwo",
+                                   direction="x", fromA=0 * self.legScale).relativeToBasePos()
+
         posTiltOne = StashPosition(jointList=0.0 * self.tiltScale, parent="hipCenter", poseName="posTiltOne",
                                     direction="y", fromA=0 * self.tiltScale).relativeToBasePos()
         posTiltTwo = StashPosition(jointList=25 * self.tiltScale, parent="hipCenter", poseName="posTiltTwo",
@@ -236,22 +241,22 @@ class LoadClipOne:
                                     direction="z", fromA=0 * self.tiltScale).relativeToBasePos()
         # list or pose keys for lerping well
         CreateDelta(
-            posLeftArmOne, posRightArmOne, posKneeRightOne, posTiltOne, posKneeLeftOne
+            posRightHipOne, posLeftArmOne, posRightArmOne, posTiltOne,
         ).addDelta(deltaName="deltaOne")
         CreateDelta(
             # StashPosition.posesDict["posTwo"],
-            posLeftArmTwo, posRightArmTwo, posKneeRightTwo, posTiltThree, posKneeLeftTwo,
+            posLeftArmTwo, posRightArmTwo, posTiltThree, posKneeRightOne, #posKneeRightTwo, posKneeLeftTwo,
         ).addDelta(deltaName="deltaTwo")
         CreateDelta(
             # StashPosition.posesDict["posTwo"],
-            posTiltTwo, posTiltFour, posKneeLeftThree
+            posTiltTwo, posTiltFour, posRightHipTwo #posKneeLeftThree
         ).addDelta(deltaName="deltaThree")
 
         Clips().PosInit(time=0)
         newTime = Clips().Poses(time=0, loadingList="deltaOne")
         newTime = Clips().Poses(time=newTime + 1, loadingList="deltaTwo")
         newTime = Clips().Poses(time=newTime + 1, loadingList="deltaThree")
-        newTime = Clips().Poses(time=newTime + 1, loadingList="deltaOne")
+        # newTime = Clips().Poses(time=newTime + 1, loadingList="deltaOne")
         # cmds.playbackOptions(minTime='0sec', maxTime=str(newTime) + 'sec')
 
 
