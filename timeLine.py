@@ -6,13 +6,8 @@ import copy
 
 
 class CreateBuild:
-    """
-    "joint":joint, "parent":parent, "rotateX":0, "rotateY":0, "rotateZ":0, "posX":xpos, "posY":ypos, "posZ":zpos
-    """
-    skeletonDict = {}
-
     def buildObjects(self):
-        pass
+        CharacterModel().makeRig()
 
 
 class Play:
