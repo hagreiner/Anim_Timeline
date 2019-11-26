@@ -122,4 +122,5 @@ class LinkBones:
         cmds.parent(CreateJoint.jointDict["Right_Wrist"], CreateJoint.jointDict["Right_Lower_Arm_Rotate"])
 
     def createIK(self):
-        pass
+        cmds.ikHandle(sj=CreateJoint.jointDict["Left_Hip"], ee=CreateJoint.jointDict["Left_Foot"], w=.5,
+                      sol="ikRPsolver", srp=True)
