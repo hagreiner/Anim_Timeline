@@ -44,7 +44,7 @@ class MainMenu:
         self.typeCol = cmds.columnLayout(self.col, parent=self.window, w=self.width)
 
         # section one
-        frameLayout1 = cmds.frameLayout(width=self.width, label="One", collapse=True, collapsable=True, marginHeight=10,
+        frameLayout1 = cmds.frameLayout(width=self.width, label="Skeleton Creation", collapse=True, collapsable=True, marginHeight=10,
                                         marginWidth=5, parent=self.typeCol, ec=partial(frameCollapseChanged, str(self.col)),
                                         cc=partial(frameCollapseChanged, str(self.col)))
 
@@ -133,15 +133,31 @@ class MainMenu:
         cmds.text("words about this")
 
         # section two
-        frameLayout1 = cmds.frameLayout(width=self.width, label="One", collapse=True, collapsable=True, marginHeight=10,
+        frameLayout1 = cmds.frameLayout(width=self.width, label="Wavy Animation", collapse=True, collapsable=True, marginHeight=10,
                                         marginWidth=5, parent=self.typeCol, ec=partial(frameCollapseChanged, str(self.col)),
                                         cc=partial(frameCollapseChanged, str(self.col)))
 
         cmds.rowColumnLayout(numberOfColumns=1, columnWidth=[(1, self.width-10)], parent=frameLayout1,
                              co=[1, "both", 5])
         cmds.button(label="Create Rig", command=lambda args: CreateBuild().buildObjects())
-        cmds.button(label="Animate", command=lambda args: None)
+        cmds.intSliderGrp("frameNum", label="Animation Length", min=MIN_TIME, max=MAX_TIME, value=(MIN_TIME + MAX_TIME)/2.0)
+        cmds.button(label="Animate", command=lambda args: Play().forwards())
         cmds.button(label="Delete", command=lambda args: delete())
+
+        cmds.text("\n", height=5)
+        cmds.separator()
+        cmds.text(" ")
+
+        cmds.text("words about this")
+
+        # section three
+        frameLayout1 = cmds.frameLayout(width=self.width, label="One", collapse=True, collapsable=True, marginHeight=10,
+                                        marginWidth=5, parent=self.typeCol, ec=partial(frameCollapseChanged, str(self.col)),
+                                        cc=partial(frameCollapseChanged, str(self.col)))
+
+        cmds.rowColumnLayout(numberOfColumns=1, columnWidth=[(1, self.width-10)], parent=frameLayout1,
+                             co=[1, "both", 5])
+        cmds.button(label="Copy Frame", command=lambda args:None)
 
         cmds.text("\n", height=5)
         cmds.separator()

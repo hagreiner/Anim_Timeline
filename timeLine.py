@@ -7,7 +7,7 @@ import copy
 
 class CreateBuild:
     def buildObjects(self):
-        CharacterModel().makeRig()
+        lowerHandle, upperHandle = CharacterModel().makeRig()
 
 
 class Play:
@@ -44,9 +44,6 @@ class LoadClipOne:
             self.direction = Play.distX
 
         self.deltaPercent = cmds.floatSliderGrp("deltaScale", query=True, value=True)
-        self.armScale = cmds.floatSlider("armScale", query=True, value=True)
-        self.legScale = cmds.floatSlider("legScale", query=True, value=True)
-        self.tiltScale = cmds.floatSlider("tiltScale", query=True, value=True)
 
     def load(self):
         Clips().PosInit(time=0)

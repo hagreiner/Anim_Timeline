@@ -35,11 +35,11 @@ class LogLoops:
         "Right_Lower_Arm_Rotate": None,
         "Right_Wrist": None,
     }
+
     def convertToJoint(self):
         for name, points in LogLoops.LoopsDict.items():
             position = CreateJoint().addOne(points)
             CreateJoint.jointDict[name] = position
-        print(CreateJoint.jointDict)
 
 
 class CreateJoint:
@@ -122,5 +122,15 @@ class LinkBones:
         cmds.parent(CreateJoint.jointDict["Right_Wrist"], CreateJoint.jointDict["Right_Lower_Arm_Rotate"])
 
     def createIK(self):
-        cmds.ikHandle(sj=CreateJoint.jointDict["Left_Hip"], ee=CreateJoint.jointDict["Left_Foot"], w=.5,
-                      sol="ikRPsolver", srp=True)
+        pass
+        # cmds.ikHandle(sj=CreateJoint.jointDict["Left_Hip"], ee=CreateJoint.jointDict["Left_Foot"], w=.5,
+        #               sol="ikRPsolver", srp=True)
+
+
+
+""""
+spine joints loop: cmds.intSliderGrp('spineJointNum', query=True, value=True)
+
+equally place between top and center before heirarchy is created
+
+"""
