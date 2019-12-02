@@ -140,7 +140,9 @@ class MainMenu:
         cmds.rowColumnLayout(numberOfColumns=1, columnWidth=[(1, self.width-10)], parent=frameLayout1,
                              co=[1, "both", 5])
         cmds.button(label="Create Rig", command=lambda args: CreateBuild().buildObjects())
-        cmds.intSliderGrp("frameNum", label="Animation Length", min=MIN_TIME, max=MAX_TIME, value=(MIN_TIME + MAX_TIME)/2.0)
+        cmds.intSliderGrp("frameNum", label="Animation Length", min=MIN_TIME, max=MAX_TIME, value=(MIN_TIME + MAX_TIME)/10.0)
+        cmds.floatSliderGrp('deltaScale', label='Big Swing', field=True, minValue=0, maxValue=1,
+                            value=1, columnWidth=[(1, 125), (2, 25), (3, self.width - 150)], cal=[1, "center"])
         cmds.button(label="Animate", command=lambda args: Play().forwards())
         cmds.button(label="Delete", command=lambda args: delete())
 
@@ -157,7 +159,7 @@ class MainMenu:
 
         cmds.rowColumnLayout(numberOfColumns=1, columnWidth=[(1, self.width-10)], parent=frameLayout1,
                              co=[1, "both", 5])
-        cmds.button(label="Copy Frame", command=lambda args:None)
+        cmds.button(label="Copy Frame", command=lambda args: printIt())
 
         cmds.text("\n", height=5)
         cmds.separator()
@@ -171,6 +173,22 @@ class MainMenu:
             winHeight += eval('cmds.' + cmds.objectTypeUI(child) + '("' + child + '", q=1, h=1)')
         cmds.window(self.window, e=1, h=winHeight)
         cmds.showWindow(self.window)
+
+
+def printIt():
+    print cmds.findKeyframe(cmds.ls(sl=True), timeSlider=True, which="next" )
+    print cmds.findKeyframe(cmds.ls(sl=True), c=True)
+    print cmds.copyKey(cmds.ls(sl=True), time=(0,20))
+
+    print cmds.keyframe(cmds.ls(sl=True), at='tx', query=True, time=(20, 20))
+
+    print cmds.keyframe(cmds.ls(sl=True), at='tx', query=True)
+    print cmds.keyframe(cmds.ls(sl=True), at='ty', query=True)
+    print cmds.keyframe(cmds.ls(sl=True), at='tz', query=True)
+
+    print cmds.keyframe(cmds.ls(sl=True), at='rx', query=True)
+    print cmds.keyframe(cmds.ls(sl=True), at='ry', query=True)
+    print cmds.keyframe(cmds.ls(sl=True), at='rz', query=True)
 
 
 class OrganicAnim:
