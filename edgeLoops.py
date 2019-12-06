@@ -67,7 +67,6 @@ def averageLocation(selection):
 
 
 class LinkBones:
-
     def createChildren(self):
         cmds.parent(CreateJoint.jointDict["Top_Spine_Joint"], CreateJoint.jointDict["Center"])
 
@@ -99,10 +98,9 @@ class LinkBones:
 
     def createIK(self):
         # right leg
-        # TODO: fix the knee locators -> need it
         rightLegPos = averageLocation(LogLoops.LoopsDict["Right_Foot"])
         rightToePos = averageLocation(LogLoops.LoopsDict["Right_Toe"])
-        addedRightLegPos = averageLocation( LogLoops.LoopsDict["Right_Knee"])
+        addedRightLegPos = averageLocation(LogLoops.LoopsDict["Right_Knee"])
 
         ikCreation.createHandle(CreateJoint.jointDict["Right_Foot"], CreateJoint.jointDict["Right_Toe"], name="Right_Foot")
         rightFoot = ikCreation.createNurbsHandle(rightToePos, [5, 5, 5],  [0, 0, 0], "Right_Foot",
@@ -117,7 +115,7 @@ class LinkBones:
         # left leg
         leftLegPos = averageLocation(LogLoops.LoopsDict["Left_Foot"])
         leftToePos = averageLocation(LogLoops.LoopsDict["Left_Toe"])
-        addedLeftLegPos = averageLocation( LogLoops.LoopsDict["Left_Knee"])
+        addedLeftLegPos = averageLocation(LogLoops.LoopsDict["Left_Knee"])
 
         ikCreation.createHandle(CreateJoint.jointDict["Left_Foot"], CreateJoint.jointDict["Left_Toe"], name="Left_Foot")
         leftFoot = ikCreation.createNurbsHandle(leftToePos, [5, 5, 5],  [0, 0, 0], "Left_Foot",
@@ -131,34 +129,44 @@ class LinkBones:
 
         # right arm
         rightWristPos = averageLocation(LogLoops.LoopsDict["Right_Wrist"])
-        addedRightElbow = averageLocation( LogLoops.LoopsDict["Right_Elbow"])
+        addedRightElbow = averageLocation(LogLoops.LoopsDict["Right_Elbow"])
+        rightArmRot = averageLocation(LogLoops.LoopsDict["Right_Lower_Arm_Rotate"])
 
         ikCreation.createHandle(CreateJoint.jointDict["Right_Shoulder"], CreateJoint.jointDict["Right_Wrist"], name="Right_Arm")
-        rightArm = ikCreation.createNurbsHandle(rightWristPos, [10, 10, 10],  [0, 0, 0], "Right_Arm",
+        rightArm = ikCreation.createNurbsHandle(rightWristPos, [10, 10, 10],  [0, 90, 0], "Right_Arm",
             listAdd(listSubtract(addedRightElbow, rightWristPos), [0, 0, -15]), True)
 
-        ikCreation.createHandle(CreateJoint.jointDict["Right_Elbow"], CreateJoint.jointDict["Right_Elbow"], name="Right_Arm_Rot")
-        rightArm_rotate = ikCreation.createNurbsHandle(addedRightElbow, [10, 10, 10],  [0, 0, 0], "Right_Arm_Rot",
+        ikCreation.createHandle(CreateJoint.jointDict["Right_Elbow"], CreateJoint.jointDict["Right_Lower_Arm_Rotate"], name="Right_Arm_Rot")
+        rightArm_rotate = ikCreation.createNurbsHandle(rightArmRot, [10, 10, 10],  [0, 90, 0], "Right_Arm_Rot",
            [0, 0, 0], True)
 
         cmds.parent(rightArm_rotate, rightArm)
 
         # left arm
         leftWristPos = averageLocation(LogLoops.LoopsDict["Left_Wrist"])
-        addedLeftElbow = averageLocation( LogLoops.LoopsDict["Left_Elbow"])
+        addedLeftElbow = averageLocation(LogLoops.LoopsDict["Left_Elbow"])
+        leftArmRot = averageLocation(LogLoops.LoopsDict["Left_Lower_Arm_Rotate"])
 
         ikCreation.createHandle(CreateJoint.jointDict["Left_Shoulder"], CreateJoint.jointDict["Left_Wrist"], name="Left_Arm")
-        leftArm = ikCreation.createNurbsHandle(leftWristPos, [10, 10, 10],  [0, 0, 0], "Left_Arm",
+        leftArm = ikCreation.createNurbsHandle(leftWristPos, [10, 10, 10],  [0, 90, 0], "Left_Arm",
             listAdd(listSubtract(addedLeftElbow, leftWristPos), [0, 0, -15]), True)
 
-        ikCreation.createHandle(CreateJoint.jointDict["Left_Elbow"], CreateJoint.jointDict["Left_Elbow"], name="Left_Arm_Rot")
-        leftArm_rotate = ikCreation.createNurbsHandle(addedLeftElbow, [10, 10, 10],  [0, 0, 0], "Left_Arm_Rot",
+        ikCreation.createHandle(CreateJoint.jointDict["Left_Elbow"], CreateJoint.jointDict["Left_Lower_Arm_Rotate"], name="Left_Arm_Rot")
+        leftArm_rotate = ikCreation.createNurbsHandle(leftArmRot, [10, 10, 10],  [0, 90, 0], "Left_Arm_Rot",
            [0, 0, 0], True)
 
         cmds.parent(leftArm_rotate, leftArm)
 
+        # center
+        center = averageLocation(LogLoops.LoopsDict["Center"])
+        spineJoint = averageLocation(LogLoops.LoopsDict["Top_Spine_Joint"])
 
-        return rightArm, leftArm, leftLeg, rightLeg
+        ikCreation.createHandle(CreateJoint.jointDict["Center"], CreateJoint.jointDict["Top_Spine_Joint"], name="Center_Bend")
+        centerRot = ikCreation.createNurbsHandle(center, [25, 25, 25], [90, 0, 0], "Center_Bend",
+                                                 listAdd(listSubtract(spineJoint, center), center), True)
+
+        # return
+        return rightArm, leftArm, leftLeg, rightLeg, leftArm_rotate, rightArm_rotate, rightFoot, leftFoot, centerRot
 
 
 def listSubtract(listOne, listTwo):
