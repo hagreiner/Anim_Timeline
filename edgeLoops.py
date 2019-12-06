@@ -1,4 +1,6 @@
 import maya.cmds as cmds
+import ikCreation
+
 
 class AssignSelection:
     def logSelect(self, strType):
@@ -65,36 +67,10 @@ def averageLocation(selection):
 
 
 class LinkBones:
-    """
-    "Center": None,
-        "Neck": None,
-        "Top_Spine_Joint": None,
 
-        "Left_Hip": None,
-        "Left_Knee": None,
-        "Left_Foot": None,
-        "Left_Foot_Flex": None,
-        "Left_Toe": None,
-        
-        "Left_Shoulder_Blade": None,
-        "Left_Shoulder": None,
-        "Left_Elbow": None,
-        "Left_Lower_Arm_Rotate": None,
-        "Left_Wrist": None,
-
-        "Right_Hip": None,
-        "Right_Knee": None,
-        "Right_Foot": None,
-        "Right_Foot_Flex": None,
-        "Right_Toe": None,
-        "Right_Shoulder_Blade": None,
-        "Right_Shoulder": None,
-        "Right_Elbow": None,
-        "Right_Lower_Arm_Rotate": None,
-        "Right_Wrist": None,
-    """
     def createChildren(self):
         cmds.parent(CreateJoint.jointDict["Top_Spine_Joint"], CreateJoint.jointDict["Center"])
+
         cmds.parent(CreateJoint.jointDict["Neck"], CreateJoint.jointDict["Top_Spine_Joint"])
         cmds.parent(CreateJoint.jointDict["Left_Hip"], CreateJoint.jointDict["Center"])
         cmds.parent(CreateJoint.jointDict["Right_Hip"], CreateJoint.jointDict["Center"])
@@ -122,15 +98,28 @@ class LinkBones:
         cmds.parent(CreateJoint.jointDict["Right_Wrist"], CreateJoint.jointDict["Right_Lower_Arm_Rotate"])
 
     def createIK(self):
-        pass
-        # cmds.ikHandle(sj=CreateJoint.jointDict["Left_Hip"], ee=CreateJoint.jointDict["Left_Foot"], w=.5,
-        #               sol="ikRPsolver", srp=True)
+        #CreateJoint.jointDict[name] = position
+        # (nurbsLocationList, nurbsSize, nurbsRotation, ik, addedLocatorList)
+
+        rightLegPos = averageLocation(LogLoops.LoopsDict["Right_Foot"])
+        rightToePos = averageLocation(LogLoops.LoopsDict["Right_Toe"])
+        addedRightLegPos = averageLocation( LogLoops.LoopsDict["Right_Knee"])
 
 
+        ikCreation.createHandle(CreateJoint.jointDict["Right_Foot"], CreateJoint.jointDict["Right_Toe"], name="Right_Foot")
+        rightFoot = ikCreation.createNurbsHandle(rightToePos, [5, 5, 5],  [0, 0, 0], "Right_Foot",
+            listAdd(rightToePos, [0, 0, 5]), True)
 
-""""
-spine joints loop: cmds.intSliderGrp('spineJointNum', query=True, value=True)
+        ikCreation.createHandle(CreateJoint.jointDict["Right_Hip"], CreateJoint.jointDict["Right_Foot"], name="Right_Leg")
+        rightLeg = ikCreation.createNurbsHandle(rightLegPos, [10, 20, 5],  [90, 0, 0], "Right_Leg",
+            listAdd(listSubtract(addedRightLegPos, rightLegPos), [0, 0, 15]), True)
 
-equally place between top and center before heirarchy is created
+        cmds.parent(rightLeg, rightFoot)
 
-"""
+
+def listSubtract(listOne, listTwo):
+    return [(listOne[0] - listTwo[0]), (listOne[1] - listTwo[1]), (listOne[2] - listTwo[2])]
+
+def listAdd(listOne, listTwo):
+    return [(listOne[0] + listTwo[0]), (listOne[1] + listTwo[1]), (listOne[2] + listTwo[2])]
+

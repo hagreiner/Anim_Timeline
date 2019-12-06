@@ -9,13 +9,14 @@ Step Two:
 Step Three:
     Paste the code below into a Python tab (NOT THE MEL ONE!! IT WONT WORK)
 
-from Anim_Timeline import UI, constants, timeLine, objects, openMayaStuff, edgeLoops
+from Anim_Timeline import UI, constants, timeLine, objects, openMayaStuff, edgeLoops, ikCreation
 reload(UI)
 reload(constants)
 reload(timeLine)
 reload(objects)
 reload(openMayaStuff)
 reload(edgeLoops)
+reload(ikCreation)
 UI.start()
 
 Step Four:

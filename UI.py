@@ -1,7 +1,6 @@
 import maya.cmds as cmds
-from constants import WIDTH, MAX_TIME, MIN_TIME, MAX_X_DIST, MIN_X_DIST
+from constants import WIDTH, MAX_TIME, MIN_TIME
 from timeLine import CreateBuild, Play
-import openMayaStuff
 from functools import partial
 import edgeLoops
 
@@ -9,7 +8,6 @@ import edgeLoops
 def start():
     cmds.currentUnit(time='ntsc')
     reset()
-
     MainMenu().start()
 
 
@@ -64,8 +62,6 @@ class MainMenu:
 
         cmds.rowColumnLayout(numberOfColumns=1, columnWidth=[(1, self.width - 10)], parent=frameLayout1,
                              co=[1, "both", 5])
-        cmds.intSliderGrp('spineJointNum', label='Number of Spine Joints', field=True, minValue=1, maxValue=10,
-                            value=1, columnWidth=[(1, 125), (2, 25), (3, self.width - 150)], cal=[1, "center"])
         cmds.text("Left Joints", bgc=(0.5, 0.5, 0.5), h=20)
 
         cmds.rowColumnLayout(numberOfColumns=2,
@@ -141,25 +137,22 @@ class MainMenu:
                              co=[1, "both", 5])
         cmds.button(label="Create Rig", command=lambda args: CreateBuild().buildObjects())
         cmds.intSliderGrp("frameNum", label="Animation Length", min=MIN_TIME, max=MAX_TIME, value=(MIN_TIME + MAX_TIME)/10.0)
-        cmds.floatSliderGrp('deltaScale', label='Big Swing', field=True, minValue=0, maxValue=1,
+        cmds.floatSliderGrp('deltaScale', label='Swing Angle', field=True, minValue=0, maxValue=1,
                             value=1, columnWidth=[(1, 125), (2, 25), (3, self.width - 150)], cal=[1, "center"])
-        cmds.button(label="Animate", command=lambda args: Play().forwards())
-        cmds.button(label="Delete", command=lambda args: delete())
 
-        cmds.text("\n", height=5)
-        cmds.separator()
-        cmds.text(" ")
+        cmds.rowColumnLayout(numberOfColumns=3,
+                             columnWidth=[(1, (self.width - 10)/3.0), (2, (self.width - 10)/3.0), (3, (self.width - 10)/3.0)],
+                             parent=frameLayout1, co=[1, "both", 5])
+        cmds.text("Swing Axis:")
+        cmds.radioCollection('directionCollection')
+        cmds.radioButton('xAxis', label='X-Axis', sl=True)
+        cmds.radioButton('yAxis', label='Y-Axis', sl=True)
 
-        cmds.text("words about this")
-
-        # section three
-        frameLayout1 = cmds.frameLayout(width=self.width, label="One", collapse=True, collapsable=True, marginHeight=10,
-                                        marginWidth=5, parent=self.typeCol, ec=partial(frameCollapseChanged, str(self.col)),
-                                        cc=partial(frameCollapseChanged, str(self.col)))
-
-        cmds.rowColumnLayout(numberOfColumns=1, columnWidth=[(1, self.width-10)], parent=frameLayout1,
+        cmds.rowColumnLayout(numberOfColumns=1, columnWidth=[(1, self.width - 10)], parent=frameLayout1,
                              co=[1, "both", 5])
-        cmds.button(label="Copy Frame", command=lambda args: printIt())
+        cmds.button(label="Animate", command=lambda args: Play().forwards())
+        cmds.button(label="Stop", command=lambda args: Play().stop())
+        cmds.button(label="Delete", command=lambda args: delete())
 
         cmds.text("\n", height=5)
         cmds.separator()
@@ -172,92 +165,6 @@ class MainMenu:
         for child in cmds.columnLayout(self.typeCol, q=1, ca=1):
             winHeight += eval('cmds.' + cmds.objectTypeUI(child) + '("' + child + '", q=1, h=1)')
         cmds.window(self.window, e=1, h=winHeight)
-        cmds.showWindow(self.window)
-
-
-def printIt():
-    print cmds.findKeyframe(cmds.ls(sl=True), timeSlider=True, which="next" )
-    print cmds.findKeyframe(cmds.ls(sl=True), c=True)
-    print cmds.copyKey(cmds.ls(sl=True), time=(0,20))
-
-    print cmds.keyframe(cmds.ls(sl=True), at='tx', query=True, time=(20, 20))
-
-    print cmds.keyframe(cmds.ls(sl=True), at='tx', query=True)
-    print cmds.keyframe(cmds.ls(sl=True), at='ty', query=True)
-    print cmds.keyframe(cmds.ls(sl=True), at='tz', query=True)
-
-    print cmds.keyframe(cmds.ls(sl=True), at='rx', query=True)
-    print cmds.keyframe(cmds.ls(sl=True), at='ry', query=True)
-    print cmds.keyframe(cmds.ls(sl=True), at='rz', query=True)
-
-
-class OrganicAnim:
-    def __init__(self):
-        self.width = WIDTH
-        self.window = "animWindow"
-        self.column = "animCol"
-
-        if cmds.window(self.window, exists=True):
-            cmds.deleteUI(self.window, window=True)
-
-        if cmds.windowPref(self.window, exists=True):
-            cmds.windowPref(self.window, remove=True)
-
-        self.typeWin = cmds.window(self.window, title="Animation Timeline",
-                                   minimizeButton=False, maximizeButton=False, sizeable=False)
-
-    def baseUI(self):
-        cmds.columnLayout(self.column, parent=self.typeWin)
-
-        cmds.rowColumnLayout(numberOfColumns=1, columnWidth=[(1, self.width)], parent=self.column)
-        cmds.text("STEP ONE", align="center", bgc=[0.5, 0.5, 0.5], h=30)
-        cmds.separator()
-
-        cmds.button(label="Build Skeleton", command=lambda args: CreateBuild().buildObjects())
-
-        cmds.rowColumnLayout(numberOfColumns=1, columnWidth=[(1, self.width)], parent=self.column)
-        cmds.separator()
-        cmds.text("STEP TWO: Animation Speed", align="center", bgc=[0.5, 0.5, 0.5], h=30)
-        cmds.separator()
-        cmds.intSliderGrp("frameNum", label="Number of Frames", field=True,
-                          minValue=MIN_TIME, maxValue=MAX_TIME, value=MIN_TIME,
-                          columnWidth=[(1, 100), (2, 50), (3, WIDTH-125)],  cal=[1, "center"])
-
-        cmds.rowColumnLayout(numberOfColumns=1, columnWidth=[(1, self.width)], parent=self.column)
-        cmds.separator()
-        cmds.text("STEP THREE: Animation Scale", align="center", bgc=[0.5, 0.5, 0.5], h=30)
-        cmds.separator()
-        cmds.floatSliderGrp("deltaScale", label="Scale (current)", field=True,
-                            minValue=0, maxValue=1, value=0.5, s=0.01,
-                            columnWidth=[(1, 100), (2, 50), (3, WIDTH-125)],  cal=[1, "center"])
-
-        cmds.rowColumnLayout(numberOfColumns=2, columnWidth=[(1, self.width/4.0), (2, self.width/4.0 * 3)], parent=self.column)
-        cmds.text("Legs Scale", h=20)
-        cmds.floatSlider("legScale", minValue=1.0, maxValue=1.05, value=1.0, s=0.01)
-        cmds.text("Arms Scale", h=20)
-        cmds.floatSlider("armScale", minValue=0.5, maxValue=1, value=0.5, s=0.01)
-        cmds.text("Tilt Scale", h=20)
-        cmds.floatSlider("tiltScale", minValue=-0.3, maxValue=0.5, value=-0.3, s=0.01)
-
-        cmds.rowColumnLayout(numberOfColumns=1, columnWidth=[(1, self.width)], parent=self.column)
-        cmds.separator()
-        cmds.text("STEP FOUR: Skeleton Size", align="center", bgc=[0.5, 0.5, 0.5], h=30)
-        cmds.separator()
-
-        cmds.rowColumnLayout(numberOfColumns=1, columnWidth=[(1, self.width)], parent=self.column)
-        cmds.separator()
-        cmds.text("STEP Five: Start", align="center", bgc=[0.5, 0.5, 0.5], h=30)
-        cmds.separator()
-        cmds.rowColumnLayout(numberOfColumns=1, columnWidth=[(1, self.width)], parent=self.column)
-        cmds.button(label="play", command=lambda args: Play().forwards())
-        cmds.text("", h=2)
-        # cmds.button(label="REVERSE", command=lambda args: Play().backwards())
-        cmds.button(label="stop", command=lambda args: Play().stop())
-        cmds.text(" ", h=2)
-        cmds.button(label="reset", command=lambda args: reset())
-        cmds.text("  ", h=2)
-        cmds.button(label="quit", command=lambda args: end())
-        # cmds.button(label="DEMO", command=lambda args: openMayaStuff.demo())
         cmds.showWindow(self.window)
 
 

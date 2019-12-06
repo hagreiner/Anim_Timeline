@@ -23,7 +23,7 @@ def demo():
     xform.setRotation(quat, om.MSpace.kObject)
     xform.setRotationComponents(py_quat, om.MSpace.kObject, asQuaternion=True)
 
-    q = om.MQuaternion( math.radians(10), om.MVector(0,1,0) )
+    q = om.MQuaternion(math.radians(10), om.MVector(0,1,0) )
     xform.rotateBy(q, om.MSpace.kTransform)
 
     half = om.MQuaternion.slerp(om.MQuaternion.kIdentity, quat, 0.5)
