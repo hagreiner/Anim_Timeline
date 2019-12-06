@@ -1,6 +1,4 @@
 import maya.cmds as cmds
-import maya.OpenMaya as om
-import math
 import ikCreation
 
 
@@ -19,7 +17,6 @@ class CharacterModel:
         handle_1 = ikCreation.createHandle(self.jointList[0], self.jointList[2], name="closeHandle")
         handle_2 = ikCreation.createHandle(self.jointList[2], self.jointList[4], name="farHandle")
 
-        # (nurbsLocationList, nurbsSize, nurbsRotation, ik, addedLocatorList)
         close = ikCreation.createNurbsHandle([0, 0, self.legthUnit*2], [5, 5, 5], [0, 0, 0], "closeHandle", [0, 0, 0], False)
         far = ikCreation.createNurbsHandle([0, 0, self.legthUnit*4], [5, 5, 5], [0, 0, 0], "farHandle", [0, 0, 0], False)
 

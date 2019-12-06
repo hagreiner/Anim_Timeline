@@ -98,28 +98,72 @@ class LinkBones:
         cmds.parent(CreateJoint.jointDict["Right_Wrist"], CreateJoint.jointDict["Right_Lower_Arm_Rotate"])
 
     def createIK(self):
-        #CreateJoint.jointDict[name] = position
-        # (nurbsLocationList, nurbsSize, nurbsRotation, ik, addedLocatorList)
-
+        # right leg
+        # TODO: fix the knee locators -> need it
         rightLegPos = averageLocation(LogLoops.LoopsDict["Right_Foot"])
         rightToePos = averageLocation(LogLoops.LoopsDict["Right_Toe"])
         addedRightLegPos = averageLocation( LogLoops.LoopsDict["Right_Knee"])
 
-
         ikCreation.createHandle(CreateJoint.jointDict["Right_Foot"], CreateJoint.jointDict["Right_Toe"], name="Right_Foot")
         rightFoot = ikCreation.createNurbsHandle(rightToePos, [5, 5, 5],  [0, 0, 0], "Right_Foot",
-            listAdd(rightToePos, [0, 0, 5]), True)
+            listAdd(rightToePos, [0, 0, 0]), True)
 
         ikCreation.createHandle(CreateJoint.jointDict["Right_Hip"], CreateJoint.jointDict["Right_Foot"], name="Right_Leg")
         rightLeg = ikCreation.createNurbsHandle(rightLegPos, [10, 20, 5],  [90, 0, 0], "Right_Leg",
             listAdd(listSubtract(addedRightLegPos, rightLegPos), [0, 0, 15]), True)
 
-        cmds.parent(rightLeg, rightFoot)
+        cmds.parent(rightFoot, rightLeg)
+
+        # left leg
+        leftLegPos = averageLocation(LogLoops.LoopsDict["Left_Foot"])
+        leftToePos = averageLocation(LogLoops.LoopsDict["Left_Toe"])
+        addedLeftLegPos = averageLocation( LogLoops.LoopsDict["Left_Knee"])
+
+        ikCreation.createHandle(CreateJoint.jointDict["Left_Foot"], CreateJoint.jointDict["Left_Toe"], name="Left_Foot")
+        leftFoot = ikCreation.createNurbsHandle(leftToePos, [5, 5, 5],  [0, 0, 0], "Left_Foot",
+            listAdd(leftToePos, [0, 0, 0]), True)
+
+        ikCreation.createHandle(CreateJoint.jointDict["Left_Hip"], CreateJoint.jointDict["Left_Foot"], name="Left_Leg")
+        leftLeg = ikCreation.createNurbsHandle(leftLegPos, [10, 20, 5],  [90, 0, 0], "Left_Leg",
+            listAdd(listSubtract(addedLeftLegPos, leftLegPos), [0, 0, 15]), True)
+
+        cmds.parent(leftFoot, leftLeg)
+
+        # right arm
+        rightWristPos = averageLocation(LogLoops.LoopsDict["Right_Wrist"])
+        addedRightElbow = averageLocation( LogLoops.LoopsDict["Right_Elbow"])
+
+        ikCreation.createHandle(CreateJoint.jointDict["Right_Shoulder"], CreateJoint.jointDict["Right_Wrist"], name="Right_Arm")
+        rightArm = ikCreation.createNurbsHandle(rightWristPos, [10, 10, 10],  [0, 0, 0], "Right_Arm",
+            listAdd(listSubtract(addedRightElbow, rightWristPos), [0, 0, -15]), True)
+
+        ikCreation.createHandle(CreateJoint.jointDict["Right_Elbow"], CreateJoint.jointDict["Right_Elbow"], name="Right_Arm_Rot")
+        rightArm_rotate = ikCreation.createNurbsHandle(addedRightElbow, [10, 10, 10],  [0, 0, 0], "Right_Arm_Rot",
+           [0, 0, 0], True)
+
+        cmds.parent(rightArm_rotate, rightArm)
+
+        # left arm
+        leftWristPos = averageLocation(LogLoops.LoopsDict["Left_Wrist"])
+        addedLeftElbow = averageLocation( LogLoops.LoopsDict["Left_Elbow"])
+
+        ikCreation.createHandle(CreateJoint.jointDict["Left_Shoulder"], CreateJoint.jointDict["Left_Wrist"], name="Left_Arm")
+        leftArm = ikCreation.createNurbsHandle(leftWristPos, [10, 10, 10],  [0, 0, 0], "Left_Arm",
+            listAdd(listSubtract(addedLeftElbow, leftWristPos), [0, 0, -15]), True)
+
+        ikCreation.createHandle(CreateJoint.jointDict["Left_Elbow"], CreateJoint.jointDict["Left_Elbow"], name="Left_Arm_Rot")
+        leftArm_rotate = ikCreation.createNurbsHandle(addedLeftElbow, [10, 10, 10],  [0, 0, 0], "Left_Arm_Rot",
+           [0, 0, 0], True)
+
+        cmds.parent(leftArm_rotate, leftArm)
+
+
+        return rightArm, leftArm, leftLeg, rightLeg
 
 
 def listSubtract(listOne, listTwo):
     return [(listOne[0] - listTwo[0]), (listOne[1] - listTwo[1]), (listOne[2] - listTwo[2])]
 
+
 def listAdd(listOne, listTwo):
     return [(listOne[0] + listTwo[0]), (listOne[1] + listTwo[1]), (listOne[2] + listTwo[2])]
-

@@ -62,27 +62,34 @@ class LoadClips(Play):
             0*self.deltaPercent*self.xAxis, 0*self.deltaPercent*self.yAxis, 0*self.deltaPercent*self.zAxis,
             CreateBuild.upperHandle).xformRot()
 
+        LoadClips.baseOff_Low = RotatePos(
+            5*self.deltaPercent*self.xAxis, 5*self.deltaPercent*self.yAxis, 5*self.deltaPercent*self.zAxis,
+            CreateBuild.lowerHandle).xformRot()
+        LoadClips.baseOff_Up = RotatePos(
+            -5*self.deltaPercent*self.xAxis, -5*self.deltaPercent*self.yAxis, -5*self.deltaPercent*self.zAxis,
+            CreateBuild.upperHandle).xformRot()
+
         LoadClips.longRotation_Low_Pos = RotatePos(
-            90*self.deltaPercent*self.xAxis, 90*self.deltaPercent*self.yAxis, 90*self.deltaPercent*self.zAxis,
+            80*self.deltaPercent*self.xAxis, 80*self.deltaPercent*self.yAxis, 80*self.deltaPercent*self.zAxis,
             CreateBuild.lowerHandle).xformRot()
         LoadClips.midRotation_Low_Pos = RotatePos(
             35*self.deltaPercent*self.xAxis, 35*self.deltaPercent*self.yAxis, 35*self.deltaPercent*self.zAxis,
             CreateBuild.lowerHandle).xformRot()
         LoadClips.longRotation_Low_Neg = RotatePos(
-            -90*self.deltaPercent*self.xAxis, -90*self.deltaPercent*self.yAxis, -90*self.deltaPercent*self.zAxis,
+            -80*self.deltaPercent*self.xAxis, -80*self.deltaPercent*self.yAxis, -80*self.deltaPercent*self.zAxis,
             CreateBuild.lowerHandle).xformRot()
         LoadClips.midRotation_Low_Neg = RotatePos(
             -35*self.deltaPercent*self.xAxis, -35*self.deltaPercent*self.yAxis, -35*self.deltaPercent*self.zAxis,
             CreateBuild.lowerHandle).xformRot()
 
         LoadClips.longRotation_Up_Pos = RotatePos(
-            90*self.deltaPercent*self.xAxis, 90*self.deltaPercent*self.yAxis, 90*self.deltaPercent*self.zAxis,
+            100*self.deltaPercent*self.xAxis, 100*self.deltaPercent*self.yAxis, 100*self.deltaPercent*self.zAxis,
             CreateBuild.upperHandle).xformRot()
         LoadClips.midRotation_Up_Pos = RotatePos(
             60*self.deltaPercent * self.xAxis, 60*self.deltaPercent * self.yAxis, 60*self.deltaPercent * self.zAxis,
             CreateBuild.upperHandle).xformRot()
         LoadClips.longRotation_Up_Neg = RotatePos(
-            -90*self.deltaPercent*self.xAxis, -90*self.deltaPercent*self.yAxis, -90*self.deltaPercent*self.zAxis,
+            -100*self.deltaPercent*self.xAxis, -100*self.deltaPercent*self.yAxis, -100*self.deltaPercent*self.zAxis,
             CreateBuild.upperHandle).xformRot()
         LoadClips.midRotation_Up_Neg = RotatePos(
             -60*self.deltaPercent * self.xAxis, -60*self.deltaPercent * self.yAxis, -60*self.deltaPercent * self.zAxis,
@@ -95,7 +102,7 @@ class LoadClips(Play):
         newTime = Clips().Poses(time=1, value=LoadClips.midRotation_Low_Pos, joint=CreateBuild.lowerHandle)
         newTime = Clips().Poses(time=newTime, value=LoadClips.longRotation_Low_Pos, joint=CreateBuild.lowerHandle)
         newTime = Clips().Poses(time=newTime, value=LoadClips.midRotation_Low_Pos, joint=CreateBuild.lowerHandle)
-        newTime = Clips().Poses(time=newTime, value=LoadClips.base_Low, joint=CreateBuild.lowerHandle)
+        newTime = Clips().Poses(time=newTime, value=LoadClips.baseOff_Low, joint=CreateBuild.lowerHandle)
 
         newTime = Clips().Poses(time=newTime, value=LoadClips.midRotation_Low_Neg, joint=CreateBuild.lowerHandle)
         newTime = Clips().Poses(time=newTime, value=LoadClips.longRotation_Low_Neg, joint=CreateBuild.lowerHandle)
@@ -105,7 +112,7 @@ class LoadClips(Play):
         newTime = Clips().Poses(time=1, value=LoadClips.midRotation_Up_Pos, joint=CreateBuild.upperHandle)
         newTime = Clips().Poses(time=newTime, value=LoadClips.longRotation_Up_Pos, joint=CreateBuild.upperHandle)
         newTime = Clips().Poses(time=newTime, value=LoadClips.midRotation_Up_Pos, joint=CreateBuild.upperHandle)
-        newTime = Clips().Poses(time=newTime, value=LoadClips.base_Up, joint=CreateBuild.upperHandle)
+        newTime = Clips().Poses(time=newTime, value=LoadClips.baseOff_Up, joint=CreateBuild.upperHandle)
 
         newTime = Clips().Poses(time=newTime, value=LoadClips.midRotation_Up_Neg, joint=CreateBuild.upperHandle)
         newTime = Clips().Poses(time=newTime, value=LoadClips.longRotation_Up_Neg, joint=CreateBuild.upperHandle)

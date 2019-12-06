@@ -19,6 +19,7 @@ def createNurbsHandle(nurbsLocationList, nurbsSize, nurbsRotation, ik, addedLoca
     cmds.scale(nurbsSize[0], nurbsSize[1], nurbsSize[2], circle)
     cmds.move(nurbsLocationList[0], nurbsLocationList[1], nurbsLocationList[2], circle, relative=True)
     cmds.rotate(nurbsRotation[0], nurbsRotation[1], nurbsRotation[2], circle, relative=True)
+
     if freeze == True:
         freezeTransformation(circle)
 
