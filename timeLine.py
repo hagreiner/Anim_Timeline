@@ -1,20 +1,23 @@
 import maya.cmds as cmds
-import maya.api.OpenMaya as om
 from constants import MAX_TIME, MIN_TIME
 from objects import CharacterModel
 import math
 import copy
+import logPoses
 
 
 class CreateBuild:
     rootJoint = None
     lowerHandle = None
     upperHandle = None
+    curvesLocationDict = None
 
-    def buildObjects(self):
+    def buildWavy(self):
         CreateBuild.rootJoint, CreateBuild.lowerHandle, CreateBuild.upperHandle = CharacterModel().makeRig()
-        # characterMesh = CharacterModel().mesh()
-        # cmds.skinCluster(CreateBuild.rootJoint, characterMesh, skinMethod=1)
+
+    def moveCurves(self):
+        CreateBuild.curvesLocationDict = logPoses.findPoseInformation.PosesDict
+        print(CreateBuild.curvesLocationDict)
 
 
 class Play:
@@ -27,11 +30,13 @@ class Play:
         cmds.select(all=True)
         cmds.cutKey(time=(0, MAX_TIME), cl=True)
         cmds.select(clear=True)
+        self.deltaPercent = cmds.floatSliderGrp("deltaScale", query=True, value=True)
+        self.deltaPercentRig = cmds.floatSliderGrp("deltaScaleRig", query=True, value=True)
+
+
+    def forwardsWavy(self):
         cmds.move(0, 0, -20, CreateBuild.lowerHandle)
         cmds.move(0, 0, -40, CreateBuild.upperHandle)
-
-        self.deltaPercent = cmds.floatSliderGrp("deltaScale", query=True, value=True)
-
         xAxis = cmds.radioButton('xAxis', query=True, select=True)
         yAxis = cmds.radioButton('yAxis', query=True, select=True)
         self.xAxis = 0
@@ -43,10 +48,15 @@ class Play:
         elif yAxis == True:
             self.yAxis = 1
 
-    def forwards(self):
         Play().stop()
-        LoadClips().load()
-        LoadClips().run()
+        LoadClips().loadWavy()
+        LoadClips().runWavy()
+        cmds.play(forward=True)
+
+    def forwardsRig(self):
+        Play().stop()
+        LoadClips().loadRig()
+        LoadClips().runRig()
         cmds.play(forward=True)
 
     def stop(self):
@@ -54,7 +64,7 @@ class Play:
 
 
 class LoadClips(Play):
-    def load(self):
+    def loadWavy(self):
         LoadClips.base_Low = RotatePos(
             0*self.deltaPercent*self.xAxis, 0*self.deltaPercent*self.yAxis, 0*self.deltaPercent*self.zAxis,
             CreateBuild.lowerHandle).xformRot()
@@ -95,7 +105,7 @@ class LoadClips(Play):
             -60*self.deltaPercent * self.xAxis, -60*self.deltaPercent * self.yAxis, -60*self.deltaPercent * self.zAxis,
             CreateBuild.upperHandle).xformRot()
 
-    def run(self):
+    def runWavy(self):
         Clips().Poses(time=0, value=LoadClips.base_Low, joint=CreateBuild.lowerHandle)
         Clips().Poses(time=0, value=LoadClips.base_Up, joint=CreateBuild.upperHandle)
 
@@ -118,6 +128,26 @@ class LoadClips(Play):
         newTime = Clips().Poses(time=newTime, value=LoadClips.longRotation_Up_Neg, joint=CreateBuild.upperHandle)
         newTime = Clips().Poses(time=newTime, value=LoadClips.midRotation_Up_Neg, joint=CreateBuild.upperHandle)
         newTime = Clips().Poses(time=newTime, value=LoadClips.base_Up, joint=CreateBuild.upperHandle)
+
+    def loadRig(self):
+        LoadClips.PoseOne = CreateBuild.curvesLocationDict["Pose_One"]
+        LoadClips.PoseTwo = CreateBuild.curvesLocationDict["Pose_Two"]
+        LoadClips.PoseThree = CreateBuild.curvesLocationDict["Pose_Three"]
+        LoadClips.PoseFour = CreateBuild.curvesLocationDict["Pose_Four"]
+
+    def runRig(self):
+        newTime = 1
+        for nurbs, location in LoadClips.PoseOne.items():
+            Clips().Poses(time=newTime, value=location, joint=nurbs)
+        newTime += 2
+        for nurbs, location in LoadClips.PoseTwo.items():
+            Clips().Poses(time=newTime, value=location, joint=nurbs)
+        newTime += 2
+        for nurbs, location in LoadClips.PoseThree.items():
+            Clips().Poses(time=newTime, value=location, joint=nurbs)
+        newTime += 2
+        for nurbs, location in LoadClips.PoseFour.items():
+            Clips().Poses(time=newTime, value=location, joint=nurbs)
 
 
 class Clips:

@@ -2,10 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c63d0522-3f6e-419b-b44f-55d06473dd04" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/createdSkeleton.mb" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/logPoses.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UI.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/edgeLoops.py" beforeDir="false" afterPath="$PROJECT_DIR$/edgeLoops.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/createdSkeleton.mb" beforeDir="false" afterPath="$PROJECT_DIR$/createdSkeleton.mb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/timeLine.py" beforeDir="false" afterPath="$PROJECT_DIR$/timeLine.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -22,12 +24,6 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
-  </component>
-  <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="1912" />
-    <option name="y" value="-8" />
-    <option name="width" value="1936" />
-    <option name="height" value="1056" />
   </component>
   <component name="ProjectId" id="1QO1oIoUNyGOuWt7ayxJ7pZMmIP" />
   <component name="ProjectLevelVcsManager">
@@ -98,7 +94,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/UI.py</url>
-          <line>172</line>
+          <line>207</line>
           <option name="timeStamp" value="9" />
         </line-breakpoint>
       </breakpoints>
