@@ -33,6 +33,10 @@ class Play:
         self.deltaPercent = cmds.floatSliderGrp("deltaScale", query=True, value=True)
         self.deltaPercentRig = cmds.floatSliderGrp("deltaScaleRig", query=True, value=True)
 
+        self.PoseOneScale = cmds.intSlider("Pose_One_Length", query=True, value=True)
+        self.PoseTwoScale = cmds.intSlider("Pose_Two_Length", query=True, value=True)
+        self.PoseThreeScale = cmds.intSlider("Pose_Three_Length", query=True, value=True)
+        self.PoseFourScale = cmds.intSlider("Pose_Four_Length", query=True, value=True)
 
     def forwardsWavy(self):
         cmds.move(0, 0, -20, CreateBuild.lowerHandle)
@@ -54,6 +58,8 @@ class Play:
         cmds.play(forward=True)
 
     def forwardsRig(self):
+        Frames.frameCount = 5 + self.PoseOneScale + self.PoseTwoScale + self.PoseThreeScale + self.PoseFourScale
+        cmds.playbackOptions(minTime='0sec', maxTime=str(Frames.frameCount/30.0) + 'sec')
         Play().stop()
         LoadClips().loadRig()
         LoadClips().runRig()
@@ -106,28 +112,30 @@ class LoadClips(Play):
             CreateBuild.upperHandle).xformRot()
 
     def runWavy(self):
-        Clips().Poses(startTime=0, value=LoadClips.base_Low, joint=CreateBuild.lowerHandle)
-        Clips().Poses(startTime=0, value=LoadClips.base_Up, joint=CreateBuild.upperHandle)
+        newTime = Clips().Poses(startTime=0, endtime=1, value=LoadClips.base_Low, joint=CreateBuild.lowerHandle)
 
-        newTime = Clips().Poses(startTime=1, value=LoadClips.midRotation_Low_Pos, joint=CreateBuild.lowerHandle)
-        newTime = Clips().Poses(startTime=newTime, value=LoadClips.longRotation_Low_Pos, joint=CreateBuild.lowerHandle)
-        newTime = Clips().Poses(startTime=newTime, value=LoadClips.midRotation_Low_Pos, joint=CreateBuild.lowerHandle)
-        newTime = Clips().Poses(startTime=newTime, value=LoadClips.baseOff_Low, joint=CreateBuild.lowerHandle)
+        newTime = Clips().Poses(startTime=newTime, endtime=newTime+1, value=LoadClips.midRotation_Low_Pos, joint=CreateBuild.lowerHandle)
+        newTime = Clips().Poses(startTime=newTime, endtime=newTime+1, value=LoadClips.longRotation_Low_Pos, joint=CreateBuild.lowerHandle)
+        newTime = Clips().Poses(startTime=newTime, endtime=newTime+1, value=LoadClips.midRotation_Low_Pos, joint=CreateBuild.lowerHandle)
+        newTime = Clips().Poses(startTime=newTime, endtime=newTime+1, value=LoadClips.baseOff_Low, joint=CreateBuild.lowerHandle)
 
-        newTime = Clips().Poses(startTime=newTime, value=LoadClips.midRotation_Low_Neg, joint=CreateBuild.lowerHandle)
-        newTime = Clips().Poses(startTime=newTime, value=LoadClips.longRotation_Low_Neg, joint=CreateBuild.lowerHandle)
-        newTime = Clips().Poses(startTime=newTime, value=LoadClips.midRotation_Low_Neg, joint=CreateBuild.lowerHandle)
-        newTime = Clips().Poses(startTime=newTime, value=LoadClips.base_Low, joint=CreateBuild.lowerHandle)
+        newTime = Clips().Poses(startTime=newTime, endtime=newTime+1, value=LoadClips.midRotation_Low_Neg, joint=CreateBuild.lowerHandle)
+        newTime = Clips().Poses(startTime=newTime, endtime=newTime+1, value=LoadClips.longRotation_Low_Neg, joint=CreateBuild.lowerHandle)
+        newTime = Clips().Poses(startTime=newTime, endtime=newTime+1, value=LoadClips.midRotation_Low_Neg, joint=CreateBuild.lowerHandle)
+        newTime = Clips().Poses(startTime=newTime, endtime=newTime+1, value=LoadClips.base_Low, joint=CreateBuild.lowerHandle)
 
-        newTime = Clips().Poses(startTime=1, value=LoadClips.midRotation_Up_Pos, joint=CreateBuild.upperHandle)
-        newTime = Clips().Poses(startTime=newTime, value=LoadClips.longRotation_Up_Pos, joint=CreateBuild.upperHandle)
-        newTime = Clips().Poses(startTime=newTime, value=LoadClips.midRotation_Up_Pos, joint=CreateBuild.upperHandle)
-        newTime = Clips().Poses(startTime=newTime, value=LoadClips.baseOff_Up, joint=CreateBuild.upperHandle)
 
-        newTime = Clips().Poses(startTime=newTime, value=LoadClips.midRotation_Up_Neg, joint=CreateBuild.upperHandle)
-        newTime = Clips().Poses(startTime=newTime, value=LoadClips.longRotation_Up_Neg, joint=CreateBuild.upperHandle)
-        newTime = Clips().Poses(startTime=newTime, value=LoadClips.midRotation_Up_Neg, joint=CreateBuild.upperHandle)
-        newTime = Clips().Poses(startTime=newTime, value=LoadClips.base_Up, joint=CreateBuild.upperHandle)
+        newTime = Clips().Poses(startTime=0, endtime=1, value=LoadClips.base_Up, joint=CreateBuild.upperHandle)
+
+        newTime = Clips().Poses(startTime=newTime, endtime=newTime+1, value=LoadClips.midRotation_Up_Pos, joint=CreateBuild.upperHandle)
+        newTime = Clips().Poses(startTime=newTime, endtime=newTime+1, value=LoadClips.longRotation_Up_Pos, joint=CreateBuild.upperHandle)
+        newTime = Clips().Poses(startTime=newTime, endtime=newTime+1, value=LoadClips.midRotation_Up_Pos, joint=CreateBuild.upperHandle)
+        newTime = Clips().Poses(startTime=newTime, endtime=newTime+1, value=LoadClips.baseOff_Up, joint=CreateBuild.upperHandle)
+
+        newTime = Clips().Poses(startTime=newTime, endtime=newTime+1, value=LoadClips.midRotation_Up_Neg, joint=CreateBuild.upperHandle)
+        newTime = Clips().Poses(startTime=newTime, endtime=newTime+1, value=LoadClips.longRotation_Up_Neg, joint=CreateBuild.upperHandle)
+        newTime = Clips().Poses(startTime=newTime, endtime=newTime+1, value=LoadClips.midRotation_Up_Neg, joint=CreateBuild.upperHandle)
+        newTime = Clips().Poses(startTime=newTime, endtime=newTime+1, value=LoadClips.base_Up, joint=CreateBuild.upperHandle)
 
     def loadRig(self):
         LoadClips.PoseOne = CreateBuild.curvesLocationDict["Pose_One"]
@@ -138,23 +146,23 @@ class LoadClips(Play):
     def runRig(self):
         newTime = 1
         for nurbs, location in LoadClips.PoseOne.items():
-            Clips().Poses(startTime=newTime, value=location, joint=nurbs)
-        newTime += 2
+            Clips().Poses(startTime=newTime, endtime=newTime+self.PoseOneScale, value=location, joint=nurbs)
+        newTime += (1 + self.PoseOneScale)
         for nurbs, location in LoadClips.PoseTwo.items():
-            Clips().Poses(startTime=newTime, value=location, joint=nurbs)
-        newTime += 2
+            Clips().Poses(startTime=newTime, endtime=newTime+self.PoseTwoScale, value=location, joint=nurbs)
+        newTime += (1 + self.PoseTwoScale)
         for nurbs, location in LoadClips.PoseThree.items():
-            Clips().Poses(startTime=newTime, value=location, joint=nurbs)
-        newTime += 2
+            Clips().Poses(startTime=newTime, endtime=newTime+self.PoseThreeScale, value=location, joint=nurbs)
+        newTime += (1 + self.PoseThreeScale)
         for nurbs, location in LoadClips.PoseFour.items():
-            Clips().Poses(startTime=newTime, value=location, joint=nurbs)
+            Clips().Poses(startTime=newTime, endtime=newTime+self.PoseFourScale, value=location, joint=nurbs)
 
 
 class Clips:
-    def Poses(self, startTime, joint, value):
-        cmds.setKeyframe(joint, attribute='translateX', t=(calcFrames()[startTime], calcFrames()[startTime + 1]), v=value[0])
-        cmds.setKeyframe(joint, attribute='translateY', t=(calcFrames()[startTime], calcFrames()[startTime + 1]), v=value[1])
-        cmds.setKeyframe(joint, attribute='translateZ', t=(calcFrames()[startTime], calcFrames()[startTime + 1]), v=value[2])
+    def Poses(self, startTime, endtime, joint, value):
+        cmds.setKeyframe(joint, attribute='translateX', t=(Frames().calcFrames()[startTime], Frames().calcFrames()[endtime]), v=value[0])
+        cmds.setKeyframe(joint, attribute='translateY', t=(Frames().calcFrames()[startTime], Frames().calcFrames()[endtime]), v=value[1])
+        cmds.setKeyframe(joint, attribute='translateZ', t=(Frames().calcFrames()[startTime], Frames().calcFrames()[endtime]), v=value[2])
         return startTime + 2
 
 
@@ -162,12 +170,13 @@ def reset():
     cmds.currentTime(0, edit=True)
 
 
-def calcFrames():
+class Frames:
     frameCount = MIN_TIME
-    returnList = []
-    for x in range(frameCount):
-        returnList.append((Play.frameNum/frameCount)*x)
-    return returnList
+    def calcFrames(self):
+        returnList = []
+        for x in range(Frames.frameCount):
+            returnList.append((Play.frameNum/Frames.frameCount)*x)
+        return returnList
 
 
 def valuesList(X, Y, Z, percent):

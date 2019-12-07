@@ -149,15 +149,30 @@ class MainMenu:
 
         cmds.rowColumnLayout(numberOfColumns=1, columnWidth=[(1, self.width - 10)], parent=frameLayout1,
                              co=[1, "both", 5])
-        cmds.intSliderGrp("frameNum", label="Animation Length", min=MIN_TIME, max=MAX_TIME, value=(MIN_TIME + MAX_TIME)/10.0)
-        cmds.floatSliderGrp('deltaScaleRig', label='Animation Scale', field=True, minValue=0, maxValue=1,
-                            value=1, columnWidth=[(1, 125), (2, 25), (3, self.width - 150)], cal=[1, "center"])
+        cmds.button(label="Confirm All Poses", command=lambda args: (CreateBuild().moveCurves()))
+
+        cmds.text("", h=5)
+
+        cmds.intSliderGrp("frameNum", label="Animation Length", min=MIN_TIME, max=MAX_TIME,
+                          value=(MIN_TIME + MAX_TIME) / 10.0)
+
+        cmds.rowColumnLayout(numberOfColumns=2,
+                             columnWidth=[(1, (self.width - 10) / 2.0), (2, (self.width - 20) / 2.0)],
+                             parent=frameLayout1, co=[1, "both", 5])
+        cmds.text("Pose One Length")
+        cmds.intSlider("Pose_One_Length", min=0, max=5, value=0)
+        cmds.text("Pose Two Length")
+        cmds.intSlider("Pose_Two_Length", min=0, max=5, value=0)
+        cmds.text("Pose Three Length")
+        cmds.intSlider("Pose_Three_Length", min=0, max=5, value=0)
+        cmds.text("Pose Four Length")
+        cmds.intSlider("Pose_Four_Length", min=0, max=5, value=0)
 
         cmds.rowColumnLayout(numberOfColumns=1, columnWidth=[(1, self.width - 10)], parent=frameLayout1,
                              co=[1, "both", 5])
-        cmds.button(label="Confirm All Poses", command=lambda args: (CreateBuild().moveCurves()))
         cmds.button(label="Animate Cycle", command=lambda args: Play().forwardsRig())
         cmds.button(label="Stop", command=lambda args: Play().stop())
+        cmds.button(label="Reset", command=lambda args: logPoses.Reset().resetPosesAndUI())
 
         cmds.text("\n", height=5)
         cmds.separator()
@@ -166,6 +181,22 @@ class MainMenu:
         cmds.text("words about this")
 
         # section three
+        frameLayout1 = cmds.frameLayout(width=self.width, label="Preset Animations", collapse=True, collapsable=True, marginHeight=10,
+                                        marginWidth=5, parent=self.typeCol, ec=partial(frameCollapseChanged, str(self.col)),
+                                        cc=partial(frameCollapseChanged, str(self.col)))
+
+        cmds.rowColumnLayout(numberOfColumns=1, columnWidth=[(1, self.width-10)], parent=frameLayout1,
+                             co=[1, "both", 5])
+        cmds.intSliderGrp("frameNum", label="Animation Length", min=MIN_TIME, max=MAX_TIME, value=(MIN_TIME + MAX_TIME)/10.0)
+        cmds.floatSliderGrp('deltaScaleRig', label='Animation Scale', field=True, minValue=0, maxValue=1,
+                            value=1, columnWidth=[(1, 125), (2, 25), (3, self.width - 150)], cal=[1, "center"])
+
+        cmds.rowColumnLayout(numberOfColumns=1, columnWidth=[(1, self.width - 10)], parent=frameLayout1,
+                             co=[1, "both", 5])
+        cmds.button(label="Animate", command=lambda args: None)
+        cmds.button(label="Stop", command=lambda args: Play().stop())
+
+        # section four
         frameLayout1 = cmds.frameLayout(width=self.width, label="Wavy Animation", collapse=True, collapsable=True, marginHeight=10,
                                         marginWidth=5, parent=self.typeCol, ec=partial(frameCollapseChanged, str(self.col)),
                                         cc=partial(frameCollapseChanged, str(self.col)))
