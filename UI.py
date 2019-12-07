@@ -185,7 +185,7 @@ class MainMenu:
         cmds.rowColumnLayout(numberOfColumns=1, columnWidth=[(1, self.width-10)], parent=frameLayout1,
                              co=[1, "both", 5])
         cmds.radioCollection('placingRadioCollection')
-        cmds.radioButton('walkingAnim', label='Walk Cycle', sl=True)
+        cmds.radioButton('default', label='Default Cycle', sl=True)
 
         cmds.floatSliderGrp('deltaScaleArms', label='Arms Scale', field=True, minValue=0, maxValue=1,
                             value=1, columnWidth=[(1, 125), (2, 25), (3, self.width - 150)], cal=[1, "center"])

@@ -15,7 +15,7 @@ def nurbsList():
     ]
 
 
-def walking():
+def default():
     # legs, arms, core
     return ({
         "legs": {
@@ -36,11 +36,11 @@ def walking():
             0: {'circle_Right_Arm': [0.0, 0.0, 0.0], 'circle_Left_Arm_Rot': [0.0, 0.0, 0.0],
                 'circle_Left_Arm': [0.0, 0.0, 0.0],  'circle_Right_Arm_Rot': [0.0, 0.0, 0.0],
                 },
-            1: {'circle_Right_Arm': [0.0, 0.0, 0.0], 'circle_Left_Arm_Rot': [0.0, 0.0, 0.0],
-                'circle_Left_Arm': [0.0, 0.0, 0.0],  'circle_Right_Arm_Rot': [0.0, 0.0, 0.0],
+            1: {'circle_Right_Arm': [32.0, 38.0, 0.0], 'circle_Left_Arm_Rot': [0.0, 0.0, 0.0],
+                'circle_Left_Arm': [5.0, 0.0, 0.0],  'circle_Right_Arm_Rot': [-10.0, 0.0, 0.0],
                 },
-            2: {'circle_Right_Arm': [0.0, 0.0, 0.0], 'circle_Left_Arm_Rot': [0.0, 0.0, 0.0],
-                'circle_Left_Arm': [0.0, 0.0, 0.0],  'circle_Right_Arm_Rot': [0.0, 0.0, 0.0],
+            2: {'circle_Right_Arm': [32.0, 38.0, 0.0], 'circle_Left_Arm_Rot': [0.0, 0.0, 0.0],
+                'circle_Left_Arm': [10.0, 0.0, 0.0],  'circle_Right_Arm_Rot': [-20.0, 0.0, 0.0],
                 },
             3: {'circle_Right_Arm': [0.0, 0.0, 0.0], 'circle_Left_Arm_Rot': [0.0, 0.0, 0.0],
                 'circle_Left_Arm': [0.0, 0.0, 0.0],  'circle_Right_Arm_Rot': [0.0, 0.0, 0.0],
@@ -67,10 +67,10 @@ def walking():
                 'circle_Left_Leg': [0.0, 0.0, 0.0], 'circle_Left_Foot': [0.0, 0.0, 0.0]
                 },
             1: {'circle_Right_Foot': [0.0, 0.0, 0.0], 'circle_Right_Leg': [0.0, 0, 0.0],
-                'circle_Left_Leg': [0.0, 0.0, 0.0], 'circle_Left_Foot': [0.0, 0.0, 0.0]
+                'circle_Left_Leg': [0.0, 5.0, 0.0], 'circle_Left_Foot': [0.0, 0.0, 0.0]
                 },
             2: {'circle_Right_Foot': [0.0, 0.0, 0.0], 'circle_Right_Leg': [0.0, 0.0, 0.0],
-                'circle_Left_Leg': [0.0, 0.0, 0.0], 'circle_Left_Foot': [0.0, 0.0, 0.0]
+                'circle_Left_Leg': [0.0, -40.0, 0.0], 'circle_Left_Foot': [0.0, 0.0, 0.0]
                 },
             3: {'circle_Right_Foot': [0.0, 0.0, 0.0], 'circle_Right_Leg': [0.0, 0.0, 0.0],
                 'circle_Left_Leg': [0.0, 0.0, 0.0], 'circle_Left_Foot': [0.0, 0.0, 0.0]

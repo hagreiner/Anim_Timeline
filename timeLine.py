@@ -6,9 +6,11 @@ import poseLibrary
 
 class CreateBuild:
     curvesLocationDict = None
+    curvesRotationDict = None
 
     def moveCurves(self):
-        CreateBuild.curvesLocationDict = logPoses.findPoseInformation.PosesDict
+        CreateBuild.curvesLocationDict = logPoses.findPoseInformation.PosesDictMove
+        CreateBuild.curvesRotationDict = logPoses.findPoseInformation.PosesDictRot
 
 
 class Play:
@@ -31,7 +33,7 @@ class Play:
         self.PoseThreeScale = cmds.intSlider("Pose_Three_Length", query=True, value=True)
         self.PoseFourScale = cmds.intSlider("Pose_Four_Length", query=True, value=True)
 
-        self.walking = cmds.radioButton('walkingAnim', query=True, select=True)
+        self.default = cmds.radioButton('default', query=True, select=True)
 
     def forwardsRig(self):
         Frames.frameCount = 5 + self.PoseOneScale + self.PoseTwoScale + self.PoseThreeScale + self.PoseFourScale
@@ -55,28 +57,46 @@ class Play:
 
 class LoadClips(Play):
     def loadRig(self):
-        LoadClips.PoseOne = CreateBuild.curvesLocationDict["Pose_One"]
-        LoadClips.PoseTwo = CreateBuild.curvesLocationDict["Pose_Two"]
-        LoadClips.PoseThree = CreateBuild.curvesLocationDict["Pose_Three"]
-        LoadClips.PoseFour = CreateBuild.curvesLocationDict["Pose_Four"]
+        LoadClips.PoseOneTranslate = CreateBuild.curvesLocationDict["Pose_One"]
+        LoadClips.PoseTwoTranslate = CreateBuild.curvesLocationDict["Pose_Two"]
+        LoadClips.PoseThreeTranslate = CreateBuild.curvesLocationDict["Pose_Three"]
+        LoadClips.PoseFourTranslate = CreateBuild.curvesLocationDict["Pose_Four"]
+
+        LoadClips.PoseOneRotation = CreateBuild.curvesLocationDict["Pose_One"]
+        LoadClips.PoseTwoRotation = CreateBuild.curvesLocationDict["Pose_Two"]
+        LoadClips.PoseThreeRotation = CreateBuild.curvesLocationDict["Pose_Three"]
+        LoadClips.PoseFourRotation = CreateBuild.curvesLocationDict["Pose_Four"]
 
     def runRig(self):
         newTime = 1
-        for nurbs, location in LoadClips.PoseOne.items():
+        for nurbs, location in LoadClips.PoseOneTranslate.items():
             Clips().PosesTranslate(startTime=newTime, endtime=newTime + self.PoseOneScale, value=location, joint=nurbs)
         newTime += (1 + self.PoseOneScale)
-        for nurbs, location in LoadClips.PoseTwo.items():
+        for nurbs, location in LoadClips.PoseTwoTranslate.items():
             Clips().PosesTranslate(startTime=newTime, endtime=newTime + self.PoseTwoScale, value=location, joint=nurbs)
         newTime += (1 + self.PoseTwoScale)
-        for nurbs, location in LoadClips.PoseThree.items():
+        for nurbs, location in LoadClips.PoseThreeTranslate.items():
             Clips().PosesTranslate(startTime=newTime, endtime=newTime + self.PoseThreeScale, value=location, joint=nurbs)
         newTime += (1 + self.PoseThreeScale)
-        for nurbs, location in LoadClips.PoseFour.items():
+        for nurbs, location in LoadClips.PoseFourTranslate.items():
             Clips().PosesTranslate(startTime=newTime, endtime=newTime + self.PoseFourScale, value=location, joint=nurbs)
 
+        newTime = 1
+        for nurbs, location in LoadClips.PoseOneRotation.items():
+            Clips().PosesRotate(startTime=newTime, endtime=newTime + self.PoseOneScale, value=location, joint=nurbs)
+        newTime += (1 + self.PoseOneScale)
+        for nurbs, location in LoadClips.PoseTwoRotation.items():
+            Clips().PosesRotate(startTime=newTime, endtime=newTime + self.PoseTwoScale, value=location, joint=nurbs)
+        newTime += (1 + self.PoseTwoScale)
+        for nurbs, location in LoadClips.PoseThreeRotation.items():
+            Clips().PosesRotate(startTime=newTime, endtime=newTime + self.PoseThreeScale, value=location, joint=nurbs)
+        newTime += (1 + self.PoseThreeScale)
+        for nurbs, location in LoadClips.PoseFourRotation.items():
+            Clips().PosesRotate(startTime=newTime, endtime=newTime + self.PoseFourScale, value=location, joint=nurbs)
+
     def loadPreSet(self):
-        if self.walking == True:
-            return poseLibrary.walking()
+        if self.default == True:
+            return poseLibrary.default()
 
     def runPreSet(self, clipsDictMove, clipsDictRot):
         newTime = 0

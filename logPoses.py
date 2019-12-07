@@ -2,7 +2,8 @@ import maya.cmds as cmds
 
 
 class findPoseInformation:
-    PosesDict = {}
+    PosesDictMove = {}
+    PosesDictRot = {}
 
     def __init__(self):
         self.nurbsList = [
@@ -19,13 +20,16 @@ class findPoseInformation:
         self.Poses = ["Pose_One", "Pose_Two", "Pose_Three", "Pose_Four"]
 
     def savePose(self, strType):
-        nurbsDict = {}
+        nurbsMoveDict = {}
         for nurbs in self.nurbsList:
-            nurbsDict[nurbs] = transforms(nurbs)
+            nurbsMoveDict[nurbs] = transforms(nurbs)
 
-        print(nurbsDict)
+        nurbsRotDict = {}
+        for nurbs in self.nurbsList:
+            nurbsRotDict[nurbs] = rotations(nurbs)
 
-        findPoseInformation.PosesDict[strType] = nurbsDict
+        findPoseInformation.PosesDictRot[strType] = nurbsRotDict
+        findPoseInformation.PosesDictMove[strType] = nurbsMoveDict
         cmds.textField(strType, edit=True, text="Pose Confirmed")
 
 
@@ -33,14 +37,20 @@ def transforms(selection):
     return cmds.xform(selection, query=True, translation=True)
 
 
+def rotations(selection):
+    return cmds.xform(selection, query=True, rotation=True)
+
+
 class Reset(findPoseInformation):
     def resetPosesAndUI(self):
         findPoseInformation.PosesDict = {}
         for nurbs in self.nurbsList:
             cmds.move(0, 0, 0, nurbs)
+            cmds.rotate(0, 0, 0, nurbs)
         for pose in self.Poses:
             cmds.textField(pose, edit=True, text="None")
 
     def resetRig(self):
         for nurbs in self.nurbsList:
             cmds.move(0, 0, 0, nurbs)
+            cmds.rotate(0, 0, 0, nurbs)
