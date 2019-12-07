@@ -23,6 +23,8 @@ class findPoseInformation:
         for nurbs in self.nurbsList:
             nurbsDict[nurbs] = transforms(nurbs)
 
+        print(nurbsDict)
+
         findPoseInformation.PosesDict[strType] = nurbsDict
         cmds.textField(strType, edit=True, text="Pose Confirmed")
 
@@ -38,3 +40,7 @@ class Reset(findPoseInformation):
             cmds.move(0, 0, 0, nurbs)
         for pose in self.Poses:
             cmds.textField(pose, edit=True, text="None")
+
+    def resetRig(self):
+        for nurbs in self.nurbsList:
+            cmds.move(0, 0, 0, nurbs)
