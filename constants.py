@@ -1,5 +1,3 @@
-WIDTH = 350
-
 MAX_TIME = 300
 
 MIN_TIME = 17

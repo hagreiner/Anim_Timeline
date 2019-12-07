@@ -1,5 +1,5 @@
 import maya.cmds as cmds
-from constants import WIDTH, MAX_TIME, MIN_TIME
+from constants import MAX_TIME, MIN_TIME
 from timeLine import CreateBuild, Play
 from functools import partial
 import edgeLoops
@@ -195,38 +195,6 @@ class MainMenu:
                              co=[1, "both", 5])
         cmds.button(label="Animate", command=lambda args: None)
         cmds.button(label="Stop", command=lambda args: Play().stop())
-
-        # section four
-        frameLayout1 = cmds.frameLayout(width=self.width, label="Wavy Animation", collapse=True, collapsable=True, marginHeight=10,
-                                        marginWidth=5, parent=self.typeCol, ec=partial(frameCollapseChanged, str(self.col)),
-                                        cc=partial(frameCollapseChanged, str(self.col)))
-
-        cmds.rowColumnLayout(numberOfColumns=1, columnWidth=[(1, self.width-10)], parent=frameLayout1,
-                             co=[1, "both", 5])
-        cmds.button(label="Create Rig", command=lambda args: CreateBuild().buildWavy())
-        cmds.intSliderGrp("frameNum", label="Animation Length", min=MIN_TIME, max=MAX_TIME, value=(MIN_TIME + MAX_TIME)/10.0)
-        cmds.floatSliderGrp('deltaScale', label='Swing Angle', field=True, minValue=0, maxValue=1,
-                            value=1, columnWidth=[(1, 125), (2, 25), (3, self.width - 150)], cal=[1, "center"])
-
-        cmds.rowColumnLayout(numberOfColumns=3,
-                             columnWidth=[(1, (self.width - 10)/3.0), (2, (self.width - 10)/3.0), (3, (self.width - 10)/3.0)],
-                             parent=frameLayout1, co=[1, "both", 5])
-        cmds.text("Swing Axis:")
-        cmds.radioCollection('directionCollection')
-        cmds.radioButton('xAxis', label='X-Axis', sl=True)
-        cmds.radioButton('yAxis', label='Y-Axis', sl=True)
-
-        cmds.rowColumnLayout(numberOfColumns=1, columnWidth=[(1, self.width - 10)], parent=frameLayout1,
-                             co=[1, "both", 5])
-        cmds.button(label="Animate", command=lambda args: Play().forwardsWavy())
-        cmds.button(label="Stop", command=lambda args: Play().stop())
-        cmds.button(label="Delete", command=lambda args: delete())
-
-        cmds.text("\n", height=5)
-        cmds.separator()
-        cmds.text(" ")
-
-        cmds.text("words about this")
 
         #put this at end
         winHeight = 0

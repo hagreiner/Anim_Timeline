@@ -1,19 +1,12 @@
 import maya.cmds as cmds
 from constants import MAX_TIME, MIN_TIME
-from objects import CharacterModel
 import math
 import copy
 import logPoses
 
 
 class CreateBuild:
-    rootJoint = None
-    lowerHandle = None
-    upperHandle = None
     curvesLocationDict = None
-
-    def buildWavy(self):
-        CreateBuild.rootJoint, CreateBuild.lowerHandle, CreateBuild.upperHandle = CharacterModel().makeRig()
 
     def moveCurves(self):
         CreateBuild.curvesLocationDict = logPoses.findPoseInformation.PosesDict
@@ -30,32 +23,12 @@ class Play:
         cmds.select(all=True)
         cmds.cutKey(time=(0, MAX_TIME), cl=True)
         cmds.select(clear=True)
-        self.deltaPercent = cmds.floatSliderGrp("deltaScale", query=True, value=True)
         self.deltaPercentRig = cmds.floatSliderGrp("deltaScaleRig", query=True, value=True)
 
         self.PoseOneScale = cmds.intSlider("Pose_One_Length", query=True, value=True)
         self.PoseTwoScale = cmds.intSlider("Pose_Two_Length", query=True, value=True)
         self.PoseThreeScale = cmds.intSlider("Pose_Three_Length", query=True, value=True)
         self.PoseFourScale = cmds.intSlider("Pose_Four_Length", query=True, value=True)
-
-    def forwardsWavy(self):
-        cmds.move(0, 0, -20, CreateBuild.lowerHandle)
-        cmds.move(0, 0, -40, CreateBuild.upperHandle)
-        xAxis = cmds.radioButton('xAxis', query=True, select=True)
-        yAxis = cmds.radioButton('yAxis', query=True, select=True)
-        self.xAxis = 0
-        self.yAxis = 0
-        self.zAxis = 0
-
-        if xAxis == True:
-            self.xAxis = 1
-        elif yAxis == True:
-            self.yAxis = 1
-
-        Play().stop()
-        LoadClips().loadWavy()
-        LoadClips().runWavy()
-        cmds.play(forward=True)
 
     def forwardsRig(self):
         Frames.frameCount = 5 + self.PoseOneScale + self.PoseTwoScale + self.PoseThreeScale + self.PoseFourScale
@@ -70,73 +43,6 @@ class Play:
 
 
 class LoadClips(Play):
-    def loadWavy(self):
-        LoadClips.base_Low = RotatePos(
-            0*self.deltaPercent*self.xAxis, 0*self.deltaPercent*self.yAxis, 0*self.deltaPercent*self.zAxis,
-            CreateBuild.lowerHandle).xformRot()
-        LoadClips.base_Up = RotatePos(
-            0*self.deltaPercent*self.xAxis, 0*self.deltaPercent*self.yAxis, 0*self.deltaPercent*self.zAxis,
-            CreateBuild.upperHandle).xformRot()
-
-        LoadClips.baseOff_Low = RotatePos(
-            5*self.deltaPercent*self.xAxis, 5*self.deltaPercent*self.yAxis, 5*self.deltaPercent*self.zAxis,
-            CreateBuild.lowerHandle).xformRot()
-        LoadClips.baseOff_Up = RotatePos(
-            -5*self.deltaPercent*self.xAxis, -5*self.deltaPercent*self.yAxis, -5*self.deltaPercent*self.zAxis,
-            CreateBuild.upperHandle).xformRot()
-
-        LoadClips.longRotation_Low_Pos = RotatePos(
-            80*self.deltaPercent*self.xAxis, 80*self.deltaPercent*self.yAxis, 80*self.deltaPercent*self.zAxis,
-            CreateBuild.lowerHandle).xformRot()
-        LoadClips.midRotation_Low_Pos = RotatePos(
-            35*self.deltaPercent*self.xAxis, 35*self.deltaPercent*self.yAxis, 35*self.deltaPercent*self.zAxis,
-            CreateBuild.lowerHandle).xformRot()
-        LoadClips.longRotation_Low_Neg = RotatePos(
-            -80*self.deltaPercent*self.xAxis, -80*self.deltaPercent*self.yAxis, -80*self.deltaPercent*self.zAxis,
-            CreateBuild.lowerHandle).xformRot()
-        LoadClips.midRotation_Low_Neg = RotatePos(
-            -35*self.deltaPercent*self.xAxis, -35*self.deltaPercent*self.yAxis, -35*self.deltaPercent*self.zAxis,
-            CreateBuild.lowerHandle).xformRot()
-
-        LoadClips.longRotation_Up_Pos = RotatePos(
-            100*self.deltaPercent*self.xAxis, 100*self.deltaPercent*self.yAxis, 100*self.deltaPercent*self.zAxis,
-            CreateBuild.upperHandle).xformRot()
-        LoadClips.midRotation_Up_Pos = RotatePos(
-            60*self.deltaPercent * self.xAxis, 60*self.deltaPercent * self.yAxis, 60*self.deltaPercent * self.zAxis,
-            CreateBuild.upperHandle).xformRot()
-        LoadClips.longRotation_Up_Neg = RotatePos(
-            -100*self.deltaPercent*self.xAxis, -100*self.deltaPercent*self.yAxis, -100*self.deltaPercent*self.zAxis,
-            CreateBuild.upperHandle).xformRot()
-        LoadClips.midRotation_Up_Neg = RotatePos(
-            -60*self.deltaPercent * self.xAxis, -60*self.deltaPercent * self.yAxis, -60*self.deltaPercent * self.zAxis,
-            CreateBuild.upperHandle).xformRot()
-
-    def runWavy(self):
-        newTime = Clips().Poses(startTime=0, endtime=1, value=LoadClips.base_Low, joint=CreateBuild.lowerHandle)
-
-        newTime = Clips().Poses(startTime=newTime, endtime=newTime+1, value=LoadClips.midRotation_Low_Pos, joint=CreateBuild.lowerHandle)
-        newTime = Clips().Poses(startTime=newTime, endtime=newTime+1, value=LoadClips.longRotation_Low_Pos, joint=CreateBuild.lowerHandle)
-        newTime = Clips().Poses(startTime=newTime, endtime=newTime+1, value=LoadClips.midRotation_Low_Pos, joint=CreateBuild.lowerHandle)
-        newTime = Clips().Poses(startTime=newTime, endtime=newTime+1, value=LoadClips.baseOff_Low, joint=CreateBuild.lowerHandle)
-
-        newTime = Clips().Poses(startTime=newTime, endtime=newTime+1, value=LoadClips.midRotation_Low_Neg, joint=CreateBuild.lowerHandle)
-        newTime = Clips().Poses(startTime=newTime, endtime=newTime+1, value=LoadClips.longRotation_Low_Neg, joint=CreateBuild.lowerHandle)
-        newTime = Clips().Poses(startTime=newTime, endtime=newTime+1, value=LoadClips.midRotation_Low_Neg, joint=CreateBuild.lowerHandle)
-        newTime = Clips().Poses(startTime=newTime, endtime=newTime+1, value=LoadClips.base_Low, joint=CreateBuild.lowerHandle)
-
-
-        newTime = Clips().Poses(startTime=0, endtime=1, value=LoadClips.base_Up, joint=CreateBuild.upperHandle)
-
-        newTime = Clips().Poses(startTime=newTime, endtime=newTime+1, value=LoadClips.midRotation_Up_Pos, joint=CreateBuild.upperHandle)
-        newTime = Clips().Poses(startTime=newTime, endtime=newTime+1, value=LoadClips.longRotation_Up_Pos, joint=CreateBuild.upperHandle)
-        newTime = Clips().Poses(startTime=newTime, endtime=newTime+1, value=LoadClips.midRotation_Up_Pos, joint=CreateBuild.upperHandle)
-        newTime = Clips().Poses(startTime=newTime, endtime=newTime+1, value=LoadClips.baseOff_Up, joint=CreateBuild.upperHandle)
-
-        newTime = Clips().Poses(startTime=newTime, endtime=newTime+1, value=LoadClips.midRotation_Up_Neg, joint=CreateBuild.upperHandle)
-        newTime = Clips().Poses(startTime=newTime, endtime=newTime+1, value=LoadClips.longRotation_Up_Neg, joint=CreateBuild.upperHandle)
-        newTime = Clips().Poses(startTime=newTime, endtime=newTime+1, value=LoadClips.midRotation_Up_Neg, joint=CreateBuild.upperHandle)
-        newTime = Clips().Poses(startTime=newTime, endtime=newTime+1, value=LoadClips.base_Up, joint=CreateBuild.upperHandle)
-
     def loadRig(self):
         LoadClips.PoseOne = CreateBuild.curvesLocationDict["Pose_One"]
         LoadClips.PoseTwo = CreateBuild.curvesLocationDict["Pose_Two"]
