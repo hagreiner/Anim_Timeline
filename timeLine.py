@@ -106,28 +106,28 @@ class LoadClips(Play):
             CreateBuild.upperHandle).xformRot()
 
     def runWavy(self):
-        Clips().Poses(time=0, value=LoadClips.base_Low, joint=CreateBuild.lowerHandle)
-        Clips().Poses(time=0, value=LoadClips.base_Up, joint=CreateBuild.upperHandle)
+        Clips().Poses(startTime=0, value=LoadClips.base_Low, joint=CreateBuild.lowerHandle)
+        Clips().Poses(startTime=0, value=LoadClips.base_Up, joint=CreateBuild.upperHandle)
 
-        newTime = Clips().Poses(time=1, value=LoadClips.midRotation_Low_Pos, joint=CreateBuild.lowerHandle)
-        newTime = Clips().Poses(time=newTime, value=LoadClips.longRotation_Low_Pos, joint=CreateBuild.lowerHandle)
-        newTime = Clips().Poses(time=newTime, value=LoadClips.midRotation_Low_Pos, joint=CreateBuild.lowerHandle)
-        newTime = Clips().Poses(time=newTime, value=LoadClips.baseOff_Low, joint=CreateBuild.lowerHandle)
+        newTime = Clips().Poses(startTime=1, value=LoadClips.midRotation_Low_Pos, joint=CreateBuild.lowerHandle)
+        newTime = Clips().Poses(startTime=newTime, value=LoadClips.longRotation_Low_Pos, joint=CreateBuild.lowerHandle)
+        newTime = Clips().Poses(startTime=newTime, value=LoadClips.midRotation_Low_Pos, joint=CreateBuild.lowerHandle)
+        newTime = Clips().Poses(startTime=newTime, value=LoadClips.baseOff_Low, joint=CreateBuild.lowerHandle)
 
-        newTime = Clips().Poses(time=newTime, value=LoadClips.midRotation_Low_Neg, joint=CreateBuild.lowerHandle)
-        newTime = Clips().Poses(time=newTime, value=LoadClips.longRotation_Low_Neg, joint=CreateBuild.lowerHandle)
-        newTime = Clips().Poses(time=newTime, value=LoadClips.midRotation_Low_Neg, joint=CreateBuild.lowerHandle)
-        newTime = Clips().Poses(time=newTime, value=LoadClips.base_Low, joint=CreateBuild.lowerHandle)
+        newTime = Clips().Poses(startTime=newTime, value=LoadClips.midRotation_Low_Neg, joint=CreateBuild.lowerHandle)
+        newTime = Clips().Poses(startTime=newTime, value=LoadClips.longRotation_Low_Neg, joint=CreateBuild.lowerHandle)
+        newTime = Clips().Poses(startTime=newTime, value=LoadClips.midRotation_Low_Neg, joint=CreateBuild.lowerHandle)
+        newTime = Clips().Poses(startTime=newTime, value=LoadClips.base_Low, joint=CreateBuild.lowerHandle)
 
-        newTime = Clips().Poses(time=1, value=LoadClips.midRotation_Up_Pos, joint=CreateBuild.upperHandle)
-        newTime = Clips().Poses(time=newTime, value=LoadClips.longRotation_Up_Pos, joint=CreateBuild.upperHandle)
-        newTime = Clips().Poses(time=newTime, value=LoadClips.midRotation_Up_Pos, joint=CreateBuild.upperHandle)
-        newTime = Clips().Poses(time=newTime, value=LoadClips.baseOff_Up, joint=CreateBuild.upperHandle)
+        newTime = Clips().Poses(startTime=1, value=LoadClips.midRotation_Up_Pos, joint=CreateBuild.upperHandle)
+        newTime = Clips().Poses(startTime=newTime, value=LoadClips.longRotation_Up_Pos, joint=CreateBuild.upperHandle)
+        newTime = Clips().Poses(startTime=newTime, value=LoadClips.midRotation_Up_Pos, joint=CreateBuild.upperHandle)
+        newTime = Clips().Poses(startTime=newTime, value=LoadClips.baseOff_Up, joint=CreateBuild.upperHandle)
 
-        newTime = Clips().Poses(time=newTime, value=LoadClips.midRotation_Up_Neg, joint=CreateBuild.upperHandle)
-        newTime = Clips().Poses(time=newTime, value=LoadClips.longRotation_Up_Neg, joint=CreateBuild.upperHandle)
-        newTime = Clips().Poses(time=newTime, value=LoadClips.midRotation_Up_Neg, joint=CreateBuild.upperHandle)
-        newTime = Clips().Poses(time=newTime, value=LoadClips.base_Up, joint=CreateBuild.upperHandle)
+        newTime = Clips().Poses(startTime=newTime, value=LoadClips.midRotation_Up_Neg, joint=CreateBuild.upperHandle)
+        newTime = Clips().Poses(startTime=newTime, value=LoadClips.longRotation_Up_Neg, joint=CreateBuild.upperHandle)
+        newTime = Clips().Poses(startTime=newTime, value=LoadClips.midRotation_Up_Neg, joint=CreateBuild.upperHandle)
+        newTime = Clips().Poses(startTime=newTime, value=LoadClips.base_Up, joint=CreateBuild.upperHandle)
 
     def loadRig(self):
         LoadClips.PoseOne = CreateBuild.curvesLocationDict["Pose_One"]
@@ -138,24 +138,24 @@ class LoadClips(Play):
     def runRig(self):
         newTime = 1
         for nurbs, location in LoadClips.PoseOne.items():
-            Clips().Poses(time=newTime, value=location, joint=nurbs)
+            Clips().Poses(startTime=newTime, value=location, joint=nurbs)
         newTime += 2
         for nurbs, location in LoadClips.PoseTwo.items():
-            Clips().Poses(time=newTime, value=location, joint=nurbs)
+            Clips().Poses(startTime=newTime, value=location, joint=nurbs)
         newTime += 2
         for nurbs, location in LoadClips.PoseThree.items():
-            Clips().Poses(time=newTime, value=location, joint=nurbs)
+            Clips().Poses(startTime=newTime, value=location, joint=nurbs)
         newTime += 2
         for nurbs, location in LoadClips.PoseFour.items():
-            Clips().Poses(time=newTime, value=location, joint=nurbs)
+            Clips().Poses(startTime=newTime, value=location, joint=nurbs)
 
 
 class Clips:
-    def Poses(self, time, joint, value):
-        cmds.setKeyframe(joint, attribute='translateX', t=(calcFrames()[time], calcFrames()[time+1]), v=value[0])
-        cmds.setKeyframe(joint, attribute='translateY', t=(calcFrames()[time], calcFrames()[time+1]), v=value[1])
-        cmds.setKeyframe(joint, attribute='translateZ', t=(calcFrames()[time], calcFrames()[time+1]), v=value[2])
-        return time + 2
+    def Poses(self, startTime, joint, value):
+        cmds.setKeyframe(joint, attribute='translateX', t=(calcFrames()[startTime], calcFrames()[startTime + 1]), v=value[0])
+        cmds.setKeyframe(joint, attribute='translateY', t=(calcFrames()[startTime], calcFrames()[startTime + 1]), v=value[1])
+        cmds.setKeyframe(joint, attribute='translateZ', t=(calcFrames()[startTime], calcFrames()[startTime + 1]), v=value[2])
+        return startTime + 2
 
 
 def reset():
