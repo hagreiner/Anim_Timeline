@@ -36,7 +36,7 @@ class MainMenu:
         if cmds.windowPref(self.window, exists=True):
             cmds.windowPref(self.window, remove=True)
 
-        self.window = cmds.window(self.window, title="Animation Timeline",
+        self.window = cmds.window(self.window, title="Animation",
                                   minimizeButton=False, maximizeButton=False, sizeable=False)
 
     def start(self):
