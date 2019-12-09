@@ -41,6 +41,10 @@ class Play:
         self.default = cmds.radioButton('default', query=True, select=True)
 
     def forwardsRig(self):
+        """
+        :summary: rests all the data for the user data animations, resets the timeline length, resets the data, and plays the clip
+        :return: nothing
+        """
         Frames.frameCount = 5 + self.PoseOneScale + self.PoseTwoScale + self.PoseThreeScale + self.PoseFourScale
         Play().stop()
         cmds.playbackOptions(minTime='0sec', maxTime=str(Frames.frameCount/30.0) + 'sec')
@@ -49,6 +53,10 @@ class Play:
         cmds.play(forward=True)
 
     def forwardsPreSetClip(self):
+        """
+        :summary: rests all the data for the ik data animations, resets the timeline length, resets the data, and plays the clip
+        :return: nothing
+        """
         clip_move, clip_rot = LoadClips().loadPreSet()
         Frames.frameCount = len(clip_move["arms"].keys()) + 1
         Play().stop()
@@ -57,11 +65,19 @@ class Play:
         cmds.play(forward=True)
 
     def stop(self):
+        """
+        :summary: stops the time slider
+        :return: nothing
+        """
         cmds.play(state=False)
 
 
 class LoadClips(Play):
     def loadRig(self):
+        """
+        :summary: collects the user created pose data formatted from another script and separates it out into separate dictionaries
+        :return: nothing
+        """
         LoadClips.PoseOneTranslate = CreateBuild.curvesLocationDict["Pose_One"]
         LoadClips.PoseTwoTranslate = CreateBuild.curvesLocationDict["Pose_Two"]
         LoadClips.PoseThreeTranslate = CreateBuild.curvesLocationDict["Pose_Three"]
@@ -73,6 +89,11 @@ class LoadClips(Play):
         LoadClips.PoseFourRotation = CreateBuild.curvesLocationDict["Pose_Four"]
 
     def runRig(self):
+        """
+        :summary: takes the user data collected from the nurbs handles and puts in on the timeline
+        :parameter: none
+        :return: nothing
+        """
         newTime = 1
         for nurbs, location in LoadClips.PoseOneTranslate.items():
             Clips().PosesTranslate(startTime=newTime, endtime=newTime + self.PoseOneScale, value=location, joint=nurbs)
@@ -100,10 +121,21 @@ class LoadClips(Play):
             Clips().PosesRotate(startTime=newTime, endtime=newTime + self.PoseFourScale, value=location, joint=nurbs)
 
     def loadPreSet(self):
+        """
+        :summary: depending on the boolean a function returning pose data is chosen
+        :parameter: none
+        :return: dictionaries of translation and rotation data
+        """
         if self.default == True:
             return poseLibrary.default()
 
     def runPreSet(self, clipsDictMove, clipsDictRot):
+        """
+        :summary: load clips on the timeline from ik data
+        :param clipsDictMove: a dictionary of all the translation data for all the poses for all the nurbs handles
+        :param clipsDictRot: a dictionary of all the rotation data for all the poses for all the nurbs handles
+        :return: nothing
+        """
         newTime = 0
         for key, nurbsList in clipsDictMove["arms"].items():
             newTime += 1
@@ -142,6 +174,14 @@ class LoadClips(Play):
                                        value=valuesList(location[0], location[1], location[2], self.deltaScaleCore), joint=nurbs)
 
 class Clips:
+    """
+    :summary: created keyed from on the timeline for rotation or translation
+    :param startTime: what time the pose should start
+    :param endtime: what time the pose should end
+    :param joint: the joint (or nurbs handle or ik handle) that is being moved or rotated
+    :param value: a list of x, y, z values in the pose of "joint"
+    :return: a time for the next pose (not always needed)
+    """
     def PosesTranslate(self, startTime, endtime, joint, value):
         cmds.setKeyframe(joint, attribute='translateX', t=(Frames().calcFrames()[startTime], Frames().calcFrames()[endtime]), v=value[0])
         cmds.setKeyframe(joint, attribute='translateY', t=(Frames().calcFrames()[startTime], Frames().calcFrames()[endtime]), v=value[1])
@@ -156,11 +196,22 @@ class Clips:
 
 
 def reset():
+    """
+    :summary: sets the time slider on the timeline to 0
+    :parameter: none
+    :return: nothing
+    """
     cmds.currentTime(0, edit=True)
 
 
 class Frames:
+    """
+    :summary: converts the amount of frames needed into units of time based on the number of frames on the timeline
+    :parameter: none
+    :return: a list of frames
+    """
     frameCount = MIN_TIME
+
     def calcFrames(self):
         returnList = []
         for x in range(Frames.frameCount):
@@ -169,21 +220,37 @@ class Frames:
 
 
 def valuesList(X, Y, Z, percent):
+    """
+    :param X: x translation or rotation
+    :param Y: y translation or rotation
+    :param Z: z translation or rotation
+    :param percent: scale value
+    :return: list of the new x, y, z coordinates with the scale applied
+    """
     return [(X*percent), (Y*percent), (Z*percent)]
 
 
 class RotatePos:
-    def __init__(self, x, y, z, handle):
-        self.parent = {"posX": 0, "posY": 0, "posZ": 0,}
-        self.handle = handle
+    """
+    :summary: rotates an object around a point and converts that matrix into x, y, z values
+    :param x: x rotation value
+    :param y: y rotation value
+    :param z: z rotation value
+    :param object: the object to be rotated
+    :param parent: the parent x, y, z position
+    """
+    def __init__(self, x, y, z, object, parent):
+        #self.parent = {"posX": 0, "posY": 0, "posZ": 0,}
+        self.parent = parent
+        self.object = object
         self.rotX = x
         self.rotY = y
         self.rotZ = z
 
     def xformRot(self):
-        cmds.rotate(self.rotX, self.rotY, self.rotZ, self.handle,
+        cmds.rotate(self.rotX, self.rotY, self.rotZ, self.object,
                     pivot=(self.parent["posX"], self.parent["posY"], self.parent["posZ"]))
-        location = cmds.xform(self.handle, query=True, bb=True)
-        cmds.rotate(0, 0, 0, self.handle, pivot=(self.parent["posX"], self.parent["posY"], self.parent["posZ"]))
+        location = cmds.xform(self.object, query=True, bb=True)
+        cmds.rotate(0, 0, 0, self.object, pivot=(self.parent["posX"], self.parent["posY"], self.parent["posZ"]))
 
         return [(location[0] + location[3])/2.0, (location[1] + location[4])/2.0, (location[2] + location[5])/2.0]
