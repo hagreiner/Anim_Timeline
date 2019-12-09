@@ -7,20 +7,33 @@ import logPoses
 
 
 def start():
+    """
+    :summary: the function that is called to start the UI, sets the timeline to 30fps, and resets the timeline
+    :parameter: none
+    :return: nothing
+    """
     cmds.currentUnit(time='ntsc')
     reset()
     MainMenu().start()
 
 
 def end():
+    """
+    :summary: closes the main UI window
+    :parameter: none
+    :return: nothing
+    """
     reset()
-    cmds.select(all=True)
-    cmds.delete()
-    if cmds.window("window", exists=True):
-        cmds.deleteUI("window", window=True)
+    if cmds.window("mainUI", exists=True):
+        cmds.deleteUI("mainUI", window=True)
 
 
 def delete():
+    """
+    :summary: selects everything in the scene and then deletes it
+    :parameter: none
+    :return: nothing
+    """
     cmds.select(all=True)
     cmds.delete()
 
@@ -40,6 +53,11 @@ class MainMenu:
                                   minimizeButton=False, maximizeButton=False, sizeable=False)
 
     def start(self):
+        """
+        :summary: is called in the start() function, contains the main UI for the scripts
+        :parameter: none
+        :return: nothing
+        """
         self.typeCol = cmds.columnLayout(self.col, parent=self.window, w=self.width)
 
         # section one
@@ -129,7 +147,6 @@ class MainMenu:
         cmds.text(" ")
 
         cmds.button(label="About this Tool", command=lambda args: InfoWindow(type="skeletonCreation").create())
-        # cmds.text("- select faces, vertices, or edges the correspond with the joint type", align="left")
 
         # section two
         frameLayout1 = cmds.frameLayout(width=self.width, label="Log Poses", collapse=True, collapsable=True, marginHeight=10,
@@ -175,7 +192,7 @@ class MainMenu:
         cmds.separator()
         cmds.text(" ")
 
-        cmds.text("words about this")
+        cmds.button(label="About this Tool", command=lambda args: InfoWindow(type="userPoses").create())
 
         # section three
         frameLayout1 = cmds.frameLayout(width=self.width, label="Preset Animations", collapse=True, collapsable=True, marginHeight=10,
@@ -212,6 +229,11 @@ class MainMenu:
         cmds.text("Animation Length")
         cmds.intSlider("frameNum", min=MIN_TIME, max=MAX_TIME, value=(MIN_TIME + MAX_TIME) / 10.0)
 
+        cmds.rowColumnLayout(numberOfColumns=1, columnWidth=[(1, self.width - 10)], parent=frameLayout1,
+                             co=[1, "both", 5])
+        cmds.separator()
+        cmds.button(label="Quit", command=lambda args: end())
+
         #put this at end
         winHeight = 0
         for child in cmds.columnLayout(self.typeCol, q=1, ca=1):
@@ -239,7 +261,15 @@ class InfoWindow:
         if type == "skeletonCreation":
             self.informationList = rigHelp()
 
+        if type == "userPoses":
+            self.informationList = userPoseHelp()
+
     def create(self):
+        """
+        :summary: a help window that is called from the MainMenu class
+        :parameter: type determines the function that will be called for the text in this window
+        :return: nothing
+        """
         cmds.columnLayout(self.col, parent=self.window)
         cmds.rowColumnLayout(numberOfColumns=1, columnWidth=[(1, self.width)], parent=self.col)
         cmds.text("About:", height=30)
@@ -269,16 +299,31 @@ class InfoWindow:
 
 
 def reset():
+    """
+    :summary: resets the current time on the timeline to zero
+    :parameter: none
+    :return: nothing
+    """
     cmds.currentTime(0, edit=True)
 
 
 def frameCollapseChanged(mainLayout):
+    """
+    :summary: updates the height of the column frames within it are collapsed or expanded
+    :param mainLayout: the column
+    :return: nothing
+    """
     cmds.evalDeferred(
         "cmds.window('mainUI', e=1, h=sum([eval('cmds.' + cmds.objectTypeUI(child) + '(\\'' + child + '\\', q=1, h=1)') "
         "for child in cmds.columnLayout('" + mainLayout + "', q=1, ca=1)]))")
 
 
 def rigHelp():
+    """
+    :summary: returns information about rig creation that will appear in the help window
+    :parameter: none
+    :return: a list of lines of text
+    """
     return [
         " - select faces, vertices, or edges the correspond with the joint type",
         " - press the button for the joint to assign it to a position",
@@ -287,3 +332,16 @@ def rigHelp():
         " - included ik handles are: arm movement, arm rotation, leg movement, and foot controls",
     ]
 
+
+def userPoseHelp():
+    """
+    :summary: returns information about user pose creation that will appear in the help window
+    :parameter: none
+    :return: a list of lines of text
+    """
+    return [
+        " - move the nurbs handles",
+        " - press the button to confirm the pose",
+        " - confirm all poses to load them and then animate them",
+        " - the pose sliders will determine the length of the pose",
+    ]

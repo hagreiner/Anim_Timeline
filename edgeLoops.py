@@ -4,6 +4,11 @@ import ikCreation
 
 class AssignSelection:
     def logSelect(self, strType):
+        """
+        :summary: updates the LogLoops.LoopsDict with the selection
+        :param strType: a string that has the same name as the joint and textbox
+        :return: nothing
+        """
         selection = cmds.ls(sl=True)
         LogLoops.LoopsDict[strType] = selection
         cmds.textField(strType, edit=True, text=selection[0])
@@ -39,6 +44,11 @@ class LogLoops:
     }
 
     def convertToJoint(self):
+        """
+        :summary: converts the selections in the LoopsDict to world space positions and joints
+        :parameter: none
+        :return: nothing
+        """
         for name, points in LogLoops.LoopsDict.items():
             position = CreateJoint().addOne(points)
             CreateJoint.jointDict[name] = position
@@ -48,12 +58,22 @@ class CreateJoint:
     jointDict = {}
 
     def addOne(self, selection):
+        """
+        :summary: joints are created based a selected area
+        :param selection: a place on an object
+        :return: a joint
+        """
         location = averageLocation(selection)
         cmds.select(clear=True)
         return cmds.joint(p=(location[0], location[1], location[2]))
 
 
 def averageLocation(selection):
+    """
+    :summary: finds the world space matrix and converts it to x, y, z position
+    :param selection: the object to find the bounding box of
+    :return: x, y, z position list
+    """
     averagedList = []
 
     cmds.select(selection)
@@ -68,6 +88,10 @@ def averageLocation(selection):
 
 class LinkBones:
     def createChildren(self):
+        """
+        :summary: creates a hierarchy on the joints
+        :return: nothing
+        """
         cmds.parent(CreateJoint.jointDict["Top_Spine_Joint"], CreateJoint.jointDict["Center"])
 
         cmds.parent(CreateJoint.jointDict["Neck"], CreateJoint.jointDict["Top_Spine_Joint"])
@@ -97,6 +121,11 @@ class LinkBones:
         cmds.parent(CreateJoint.jointDict["Right_Wrist"], CreateJoint.jointDict["Right_Lower_Arm_Rotate"])
 
     def createIK(self):
+        """
+        :summary: creates the ik and nurbs handles based on the joints in the CreateJoint.jointDict dictionary
+        :parameter: none
+        :return: all the created nurbs handles
+        """
         # right leg
         rightLegPos = averageLocation(LogLoops.LoopsDict["Right_Foot"])
         rightToePos = averageLocation(LogLoops.LoopsDict["Right_Toe"])
@@ -170,8 +199,20 @@ class LinkBones:
 
 
 def listSubtract(listOne, listTwo):
+    """
+    :summary: subtracts the items in a len(3) list from another len(3) list
+    :param listOne: larger list
+    :param listTwo: smaller list
+    :return: returns the subtracted result
+    """
     return [(listOne[0] - listTwo[0]), (listOne[1] - listTwo[1]), (listOne[2] - listTwo[2])]
 
 
 def listAdd(listOne, listTwo):
+    """
+    :summary: adds the items of two len(3) lists together
+    :param listOne: a three item list
+    :param listTwo: a three item list
+    :return: the result of the lists
+    """
     return [(listOne[0] + listTwo[0]), (listOne[1] + listTwo[1]), (listOne[2] + listTwo[2])]

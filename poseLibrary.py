@@ -16,7 +16,13 @@ def nurbsList():
 
 
 def default():
-    # legs, arms, core
+    """
+    :summary:
+        - pose data is separated out into three sub dictionaries per dictionary
+        - the sub dictionaries are separated out into legs, arms, and core
+    :parameter: none
+    :return: one translation dictionary and one rotation dictionary
+    """
     return ({
         "legs": {
             0: {'circle_Right_Foot': [0.0, 0.0, 0.0], 'circle_Right_Leg': [0.0, 0.0, 0.0],

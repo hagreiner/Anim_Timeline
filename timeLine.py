@@ -9,6 +9,11 @@ class CreateBuild:
     curvesRotationDict = None
 
     def moveCurves(self):
+        """
+        :summary: creates class variables for dictionaries from the the pose data created by user nurb movement
+        :parameter: none
+        :return: nothing
+        """
         CreateBuild.curvesLocationDict = logPoses.findPoseInformation.PosesDictMove
         CreateBuild.curvesRotationDict = logPoses.findPoseInformation.PosesDictRot
 

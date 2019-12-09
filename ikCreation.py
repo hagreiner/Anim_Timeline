@@ -2,11 +2,28 @@ import maya.cmds as cmds
 
 
 def createHandle(start, end, name):
+    """
+    :summary: creates an ik handle
+    :param start: the starting joint
+    :param end: the ik end effector
+    :param name: name of the handle
+    :return: the ik handle
+    """
     handle = cmds.ikHandle(sj=start, ee=end, pcv=True, p=1, n=name)
     return handle
 
 
 def createNurbsHandle(nurbsLocationList, nurbsSize, nurbsRotation, ik, addedLocatorList, freeze):
+    """
+    :summary: adds pole vectors, locators, and nurbs handles to an ik handle
+    :param nurbsLocationList: when the nurbs handle should be
+    :param nurbsSize: the size of the nurbs handle
+    :param nurbsRotation: the rotation of the nurbs handle
+    :param ik: the name of the ik handle
+    :param addedLocatorList: an extra movement that should be added to the locator
+    :param freeze: a boolean that says if transforms should be frozen or not
+    :return: the nurbs handle
+    """
     cmds.spaceLocator(n='ik_loc_' + ik)
     position = cmds.xform(ik, q=True, ws=True, t=True)
     cmds.xform('ik_loc_' + ik, ws=True, t=position)
@@ -30,4 +47,9 @@ def createNurbsHandle(nurbsLocationList, nurbsSize, nurbsRotation, ik, addedLoca
 
 
 def freezeTransformation(item):
+    """
+    :summary: sets the transforms, rotations, and scale to 1 or 0
+    :param item: the object that is being reset
+    :return: none
+    """
     cmds.makeIdentity(item, apply=True, t=1, r=1, s=1, n=0)
