@@ -192,7 +192,7 @@ class LinkBones:
 
         ikCreation.createHandle(CreateJoint.jointDict["Center"], CreateJoint.jointDict["Top_Spine_Joint"], name="Center_Bend")
         centerRot = ikCreation.createNurbsHandle(center, [25, 25, 25], [90, 0, 0], "Center_Bend",
-                                                 listAdd(listSubtract(spineJoint, center), center), True)
+                                                 [0, 0, 0], True) #listAdd(listSubtract(spineJoint, center), center)
 
         # return
         return rightArm, leftArm, leftLeg, rightLeg, leftArm_rotate, rightArm_rotate, rightFoot, leftFoot, centerRot

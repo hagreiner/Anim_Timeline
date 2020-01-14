@@ -3,7 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="c63d0522-3f6e-419b-b44f-55d06473dd04" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/timeLine.py" beforeDir="false" afterPath="$PROJECT_DIR$/timeLine.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/edgeLoops.py" beforeDir="false" afterPath="$PROJECT_DIR$/edgeLoops.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
