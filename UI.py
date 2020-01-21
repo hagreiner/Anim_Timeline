@@ -1,6 +1,6 @@
 import maya.cmds as cmds
 from constants import MAX_TIME, MIN_TIME
-from timeLine import CreateBuild, Play
+from timeLine import CreateBuild, Play, LoadCurves
 from functools import partial
 import edgeLoops
 import logPoses
@@ -14,7 +14,7 @@ def start():
     """
     cmds.currentUnit(time='ntsc')
     reset()
-    MainMenu().start()
+    MainMenu().presetUp()
 
 
 def end():
@@ -38,7 +38,13 @@ def delete():
     cmds.delete()
 
 
+def assignValueToPose():
+    MainMenu.poseNum = cmds.intField("poseNum", query=True, value=True) - 1
+
+
 class MainMenu:
+    poseNum = 0
+
     def __init__(self):
         self.col = "mainCol"
         self.window = "mainUI"
@@ -49,8 +55,19 @@ class MainMenu:
         if cmds.windowPref(self.window, exists=True):
             cmds.windowPref(self.window, remove=True)
 
-        self.window = cmds.window(self.window, title="Animation",
+        self.window = cmds.window(self.window, title="Posing Tool",
                                   minimizeButton=False, maximizeButton=False, sizeable=False)
+
+    def presetUp(self):
+        self.typeCol = cmds.columnLayout(self.col, parent=self.window)
+        cmds.rowColumnLayout(numberOfColumns=1, parent=self.typeCol)
+        cmds.text("Select Rig", h=40, width=self.width)
+        cmds.button(label="Confirm", command=lambda args: (assignValueToPose(), MainMenu().start(), LoadCurves().add()),
+                    height=25, width=50)  # needs to also log them
+        cmds.text("Number of Poses", h=40)
+        cmds.intField("poseNum", min=1, max=50, value=4, width=50)
+
+        cmds.showWindow(self.window)
 
     def start(self):
         """
@@ -60,93 +77,7 @@ class MainMenu:
         """
         self.typeCol = cmds.columnLayout(self.col, parent=self.window, w=self.width)
 
-        # section one
-        frameLayout1 = cmds.frameLayout(width=self.width, label="Skeleton Creation", collapse=True, collapsable=True, marginHeight=10,
-                                        marginWidth=5, parent=self.typeCol, ec=partial(frameCollapseChanged, str(self.col)),
-                                        cc=partial(frameCollapseChanged, str(self.col)))
-
-        cmds.rowColumnLayout(numberOfColumns=1, columnWidth=[(1, self.width - 10)], parent=frameLayout1,
-                             co=[1, "both", 5])
-        cmds.text("Center Joints", bgc=(0.5, 0.5, 0.5), h=20)
-
-        cmds.rowColumnLayout(numberOfColumns=2,
-                             columnWidth=[(1, (self.width - 10) / 2.0), (2, (self.width - 10) / 2.0)],
-                             parent=frameLayout1, co=[1, "both", 5])
-        cmds.button(label="Center", command=lambda args: edgeLoops.AssignSelection().logSelect("Center"), height=20)
-        cmds.textField("Center", en=False, text="None", height=20)
-        cmds.button(label="Neck", command=lambda args: edgeLoops.AssignSelection().logSelect("Neck"), height=20)
-        cmds.textField("Neck", en=False, text="None", height=20)
-        cmds.button(label="Top Spine Joint", command=lambda args: edgeLoops.AssignSelection().logSelect("Top_Spine_Joint"), height=20)
-        cmds.textField("Top Spine_Joint", en=False, text="None", height=20)
-
-        cmds.rowColumnLayout(numberOfColumns=1, columnWidth=[(1, self.width - 10)], parent=frameLayout1,
-                             co=[1, "both", 5])
-        cmds.text("Left Joints", bgc=(0.5, 0.5, 0.5), h=20)
-
-        cmds.rowColumnLayout(numberOfColumns=2,
-                             columnWidth=[(1, (self.width - 10) / 2.0), (2, (self.width - 10) / 2.0)],
-                             parent=frameLayout1, co=[1, "both", 5])
-        cmds.button(label="Left Hip", command=lambda args: edgeLoops.AssignSelection().logSelect("Left_Hip"), height=20)
-        cmds.textField("Left_Hip", en=False, text="None", height=20)
-        cmds.button(label="Left Knee", command=lambda args: edgeLoops.AssignSelection().logSelect("Left_Knee"), height=20)
-        cmds.textField("Left_Knee", en=False, text="None", height=20)
-        cmds.button(label="Left Foot", command=lambda args: edgeLoops.AssignSelection().logSelect("Left_Foot"), height=20)
-        cmds.textField("Left_Foot", en=False, text="None", height=20)
-        cmds.button(label="Left Foot Flex", command=lambda args: edgeLoops.AssignSelection().logSelect("Left_Foot_Flex"), height=20)
-        cmds.textField("Left_Foot_Flex", en=False, text="None", height=20)
-        cmds.button(label="Left Toe", command=lambda args: edgeLoops.AssignSelection().logSelect("Left_Toe"), height=20)
-        cmds.textField("Left_Toe", en=False, text="None", height=20)
-        cmds.button(label="Left Shoulder Blade", command=lambda args: edgeLoops.AssignSelection().logSelect("Left_Shoulder_Blade"), height=20)
-        cmds.textField("Left_Shoulder_Blade", en=False, text="None", height=20)
-        cmds.button(label="Left Shoulder", command=lambda args: edgeLoops.AssignSelection().logSelect("Left_Shoulder"), height=20)
-        cmds.textField("Left_Shoulder", en=False, text="None", height=20)
-        cmds.button(label="Left Elbow", command=lambda args: edgeLoops.AssignSelection().logSelect("Left_Elbow"), height=20)
-        cmds.textField("Left_Elbow", en=False, text="None", height=20)
-        cmds.button(label="Left Lower Arm Rotate", command=lambda args: edgeLoops.AssignSelection().logSelect("Left_Lower_Arm_Rotate"), height=20)
-        cmds.textField("Left_Lower_Arm_Rotate", en=False, text="None", height=20)
-        cmds.button(label="Left Wrist", command=lambda args: edgeLoops.AssignSelection().logSelect("Left_Wrist"), height=20)
-        cmds.textField("Left_Wrist", en=False, text="None", height=20)
-
-        cmds.rowColumnLayout(numberOfColumns=1, columnWidth=[(1, self.width - 10)], parent=frameLayout1,
-                             co=[1, "both", 5])
-        cmds.text("Right Joints", bgc=(0.5, 0.5, 0.5), h=20)
-
-        cmds.rowColumnLayout(numberOfColumns=2,
-                             columnWidth=[(1, (self.width - 10) / 2.0), (2, (self.width - 10) / 2.0)],
-                             parent=frameLayout1, co=[1, "both", 5])
-        cmds.button(label="Right Hip", command=lambda args: edgeLoops.AssignSelection().logSelect("Right_Hip"), height=20)
-        cmds.textField("Right_Hip", en=False, text="None", height=20)
-        cmds.button(label="Right Knee", command=lambda args: edgeLoops.AssignSelection().logSelect("Right_Knee"), height=20)
-        cmds.textField("Right_Knee", en=False, text="None", height=20)
-        cmds.button(label="Right Foot", command=lambda args: edgeLoops.AssignSelection().logSelect("Right_Foot"), height=20)
-        cmds.textField("Right_Foot", en=False, text="None", height=20)
-        cmds.button(label="Right Foot Flex", command=lambda args: edgeLoops.AssignSelection().logSelect("Right_Foot_Flex"), height=20)
-        cmds.textField("Right_Foot_Flex", en=False, text="None", height=20)
-        cmds.button(label="Right Toe", command=lambda args: edgeLoops.AssignSelection().logSelect("Right_Toe"), height=20)
-        cmds.textField("Right_Toe", en=False, text="None", height=20)
-        cmds.button(label="Right Shoulder Blade", command=lambda args: edgeLoops.AssignSelection().logSelect("Right_Shoulder_Blade"), height=20)
-        cmds.textField("Right_Shoulder_Blade", en=False, text="None", height=20)
-        cmds.button(label="Right Shoulder", command=lambda args: edgeLoops.AssignSelection().logSelect("Right_Shoulder"), height=20)
-        cmds.textField("Right_Shoulder", en=False, text="None", height=20)
-        cmds.button(label="Right Elbow", command=lambda args: edgeLoops.AssignSelection().logSelect("Right_Elbow"), height=20)
-        cmds.textField("Right_Elbow", en=False, text="None", height=20)
-        cmds.button(label="Right Lower Arm Rotate", command=lambda args: edgeLoops.AssignSelection().logSelect("Right_Lower_Arm_Rotate"), height=20)
-        cmds.textField("Right_Lower_Arm_Rotate", en=False, text="None", height=20)
-        cmds.button(label="Right Wrist", command=lambda args: edgeLoops.AssignSelection().logSelect("Right_Wrist"), height=20)
-        cmds.textField("Right_Wrist", en=False, text="None", height=20)
-
-        cmds.rowColumnLayout(numberOfColumns=1, columnWidth=[(1, self.width - 10)], parent=frameLayout1,
-                             co=[1, "both", 5])
-        cmds.button(label="Confirm", command=lambda args: edgeLoops.LogLoops().convertToJoint())
-        cmds.text("", h=1)
-        cmds.button(label="Create Hierarchy",
-                    command=lambda args: (edgeLoops.LinkBones().createChildren(), edgeLoops.LinkBones().createIK()))
-
-        cmds.text("\n", height=5)
-        cmds.separator()
-        cmds.text(" ")
-
-        cmds.button(label="About this Tool", command=lambda args: InfoWindow(type="skeletonCreation").create())
+        # section one - this was removed
 
         # section two
         frameLayout1 = cmds.frameLayout(width=self.width, label="Log Poses", collapse=True, collapsable=True, marginHeight=10,
@@ -155,32 +86,31 @@ class MainMenu:
 
         cmds.rowColumnLayout(numberOfColumns=2, columnWidth=[(1, (self.width - 10)/2.0), (2, (self.width - 10)/2.0)],
                              parent=frameLayout1, co=[1, "both", 5])
-        cmds.button(label="Pose One", command=lambda args: logPoses.findPoseInformation().savePose("Pose_One"), height=20)
-        cmds.textField("Pose_One", en=False, text="None", height=20)
-        cmds.button(label="Pose Two", command=lambda args: logPoses.findPoseInformation().savePose("Pose_Two"), height=20)
-        cmds.textField("Pose_Two", en=False, text="None", height=20)
-        cmds.button(label="Pose Three", command=lambda args: logPoses.findPoseInformation().savePose("Pose_Three"), height=20)
-        cmds.textField("Pose_Three", en=False, text="None", height=20)
-        cmds.button(label="Pose Four", command=lambda args: logPoses.findPoseInformation().savePose("Pose_Four"), height=20)
-        cmds.textField("Pose_Four", en=False, text="None", height=20)
+        cmds.button(label="Pose " + str(0),
+                    command=lambda args: logPoses.findPoseInformation().savePose("Pose_" + str(0)), height=20)
+        cmds.textField("Pose_" + str(0), en=False, text="None", height=20)
+
+        for number in range(MainMenu.poseNum):
+            cmds.button(label="Pose " + str(number + 1),
+                        command=lambda args: logPoses.findPoseInformation().savePose("Pose_" + str(number + 1)),
+                        height=20)
+            cmds.textField("Pose_" + str(number + 1), en=False, text="None", height=20)
 
         cmds.rowColumnLayout(numberOfColumns=1, columnWidth=[(1, self.width - 10)], parent=frameLayout1,
                              co=[1, "both", 5])
-        cmds.button(label="Confirm All Poses", command=lambda args: (CreateBuild().moveCurves()))
+        cmds.button(label="Confirm All Poses", command=lambda args: None)
 
         cmds.text("", h=5)
 
-        cmds.rowColumnLayout(numberOfColumns=2,
+        poseChildren = cmds.rowColumnLayout(numberOfColumns=2,
                              columnWidth=[(1, (self.width - 10) / 2.0), (2, (self.width - 20) / 2.0)],
                              parent=frameLayout1, co=[1, "both", 5])
-        cmds.text("Pose One Length")
-        cmds.intSlider("Pose_One_Length", min=0, max=5, value=0)
-        cmds.text("Pose Two Length")
-        cmds.intSlider("Pose_Two_Length", min=0, max=5, value=0)
-        cmds.text("Pose Three Length")
-        cmds.intSlider("Pose_Three_Length", min=0, max=5, value=0)
-        cmds.text("Pose Four Length")
-        cmds.intSlider("Pose_Four_Length", min=0, max=5, value=0)
+        cmds.text("Pose " + str(0))
+        cmds.intSlider("Pose_Length_" + str(0), min=0, max=5, value=0)
+
+        for number in range(MainMenu.poseNum):
+            cmds.text("Pose " + str(number+1))
+            cmds.intSlider("Pose_Length_" + str(number+1), min=0, max=5, value=0)
 
         cmds.rowColumnLayout(numberOfColumns=1, columnWidth=[(1, self.width - 10)], parent=frameLayout1,
                              co=[1, "both", 5])

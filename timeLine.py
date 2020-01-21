@@ -4,6 +4,18 @@ import logPoses
 import poseLibrary
 
 
+class LoadCurves:
+    userCurves = None
+
+    def add(self):
+        LoadCurves.userCurves = cmds.ls(sl=True)
+
+
+class LoadPoseData:
+    def findPoseInformation(self):
+        pass
+
+
 class CreateBuild:
     curvesLocationDict = None
     curvesRotationDict = None
